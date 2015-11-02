@@ -1,5 +1,8 @@
 require "wpclient/version"
+require "wpclient/client"
 
 module Wpclient
-  # Your code goes here...
+  def self.new(*args)
+    Client.new(*args)
+  end
 end
