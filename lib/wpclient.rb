@@ -1,4 +1,5 @@
 require "wpclient/version"
+require "wpclient/errors"
 require "wpclient/client"
 
 module Wpclient

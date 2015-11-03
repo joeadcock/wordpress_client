@@ -1,4 +1,5 @@
 require "faraday"
+require "json"
 
 module Wpclient
   class Client
@@ -11,7 +12,9 @@ module Wpclient
     end
 
     def posts(per_page: 10, page: 1)
-      JSON.parse(connection.get("posts", page: page, per_page: per_page).body)
+      parse_json_response connection.get("posts", page: page, per_page: per_page)
+    rescue Faraday::TimeoutError
+      raise Wpclient::TimeoutError
     end
 
     def inspect
@@ -28,6 +31,20 @@ module Wpclient
         conn.request :basic_auth, username, @password
         conn.adapter :net_http
       end
+    end
+
+    def parse_json_response(response)
+      raise Wpclient::ServerError, "Server returned #{response.status}" if response.status != 200
+
+      content_type = response.headers["content-type"]
+      unless content_type == "application/json"
+        raise Wpclient::ServerError, "Got content type #{content_type}"
+      end
+
+      JSON.parse(response.body)
+
+    rescue JSON::ParserError => error
+      raise Wpclient::ServerError, "Could not parse JSON response: #{error}"
     end
   end
 end
