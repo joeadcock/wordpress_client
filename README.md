@@ -31,7 +31,13 @@ client.create_post(data.merge(id: post.id))
 
 ## Running tests
 
-Run tests with `rake spec`.
+You need to install Docker and set it up for your machine. Note that you need `docker-machine` to run Docker on OS X.
+
+Run tests using the normal `rspec` command after installing all bundles. The first time the integration tests are run, a docker image will be built that hosts a Wordpress installation, but the image will be re-used on subsequent runs.
+
+```
+bundle exec rspec
+```
 
 ## Copyright & License
 
