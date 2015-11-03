@@ -16,7 +16,7 @@ You\ll be greeted by the Wordpress installer. Fill in everything and complete th
 Then, **in your container's terminal**, run the following command:
 
 ```bash
-mysqldump -u "$MYSQL_USER" --password="$MYSQL_PASS" --host="$MYSQL_HOST" "$MYSQL_DB" | gzip > /tmp/dbdump.sql.gz
+mysqldump -u "$MYSQL_USER" --password="$MYSQL_PASS" --host="$MYSQL_HOST" "$MYSQL_DB" | gzip -9 > /tmp/dbdump.sql.gz
 ```
 
 You can then copy the file to your host using the `docker cp` command:
@@ -24,7 +24,7 @@ You can then copy the file to your host using the `docker cp` command:
 ```bash
 docker ps | grep wpclient-test
 # See the container ID or name of your running container
-docker cp THE-CONTAINER-ID:/tmp/dmdump.sql.gz .
+docker cp THE-CONTAINER-ID:/tmp/dbdump.sql.gz .
 ```
 
 You can then shut down your container by logging out of the container terminal.
