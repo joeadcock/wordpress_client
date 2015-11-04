@@ -17,7 +17,7 @@ describe Wpclient::Client do
     it "has working pagination" do
       request_stub = stub_request(
         :get, "http://myself:mysecret@example.com/wp-json/wp/v2/posts?per_page=13&page=2"
-      ).to_return(body: "[]", headers: {"content-type" => "application/json"})
+      ).to_return(body: "[]", headers: {"content-type" => "application/json; charset=utf-8"})
 
       client = Wpclient.new(
         url: "http://example.com/wp-json", username: "myself", password: "mysecret"

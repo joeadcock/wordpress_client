@@ -36,7 +36,7 @@ module Wpclient
     def parse_json_response(response)
       raise Wpclient::ServerError, "Server returned #{response.status}" if response.status != 200
 
-      content_type = response.headers["content-type"]
+      content_type = response.headers["content-type"].split(";").first
       unless content_type == "application/json"
         raise Wpclient::ServerError, "Got content type #{content_type}"
       end
