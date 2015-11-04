@@ -14,19 +14,6 @@ module DockerRunner
       @container_id = container_id
       @port = port
       @host = host
-      @running = true
-      at_exit { stop if running? }
-    end
-
-    def stop
-      if running?
-        system "docker kill #{container_id.shellescape} > /dev/null"
-        @running = false
-      end
-    end
-
-    def running?
-      @running
     end
 
     def url
@@ -58,6 +45,7 @@ module DockerRunner
     end
 
     puts " http://#{host}:#{port}"
+    at_exit { kill_container container_id }
     [container_id, host, port]
   end
 
@@ -84,7 +72,13 @@ module DockerRunner
   end
 
   def kill_container(container_id)
-    system "docker kill #{container_id.shellescape}"
+    output = %x{
+      docker kill #{container_id.shellescape};
+      docker rm #{container_id.shellescape}
+    }
+    unless $?.success?
+      raise "Could not clean up docker image #{container_id}. Output was:\n#{output}.\n"
+    end
   end
 
   def wait_for_container_to_start(container_id, port:, host:)
