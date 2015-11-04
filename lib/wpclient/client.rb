@@ -12,7 +12,11 @@ module Wpclient
     end
 
     def posts(per_page: 10, page: 1)
-      parse_json_response connection.get("posts", page: page, per_page: per_page)
+      parse_json_response(
+        connection.get("posts", page: page, per_page: per_page)
+      ).map do |post|
+        Post.new(post)
+      end
     rescue Faraday::TimeoutError
       raise Wpclient::TimeoutError
     end

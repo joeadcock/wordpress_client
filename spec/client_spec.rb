@@ -29,6 +29,21 @@ describe Wpclient::Client do
       expect(posts).to eq []
     end
 
+    it "maps posts into Post instances" do
+      fixture_post = json_fixture("simple-post.json")
+
+      stub_request(:get, %r{.}).to_return(
+        headers: {"content-type" => "application/json"},
+        body: [fixture_post].to_json,
+      )
+
+      client = Wpclient.new(url: "http://example.com/", username: "x", password: "x")
+      post = client.posts.first
+
+      expect(post).to be_instance_of(Wpclient::Post)
+      expect(post.id).to eq fixture_post.fetch("id")
+    end
+
     it "raises an Wpclient::TimeoutError when request times out" do
       stub_request(:get, %r{.}).to_timeout
       expect { make_client.posts }.to raise_error(Wpclient::TimeoutError)

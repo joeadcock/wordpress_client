@@ -16,8 +16,7 @@ describe "integration tests" do
     expect(posts.size).to be 1
 
     post = posts.first
-    pending "Need to create Post class"
     expect(post).to be_instance_of Wpclient::Post
-    expect(post.title).to eq "Hello World!"
+    expect(post.title).to eq "Hello world!"
   end
 end
