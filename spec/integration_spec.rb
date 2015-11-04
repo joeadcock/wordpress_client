@@ -19,4 +19,23 @@ describe "integration tests" do
     expect(post).to be_instance_of Wpclient::Post
     expect(post.title).to eq "Hello world!"
   end
+
+  it "can create a post" do
+    client = Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
+
+    data = {
+      title: "A newly created post",
+      status: "publish",
+    }
+
+    pending "Need to create #create_post"
+    post = client.create_post(data)
+
+    expect(post.id).to be_instance_of Integer
+
+    # Try to find the post to determine if it was persisted or not
+    all_posts = client.posts(per_page: 100)
+    expect(all_posts.map(&:id)).to include post.id
+    expect(all_posts.map(&:title)).to include "A newly created post"
+  end
 end
