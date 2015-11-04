@@ -35,3 +35,6 @@ RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-ap
 RUN curl -SL https://github.com/WP-API/Basic-Auth/archive/master.tar.gz \
   | tar -xzC /var/www/html/wordpress/wp-content/plugins/ \
   && mv /var/www/html/wordpress/wp-content/plugins/Basic-Auth* /var/www/html/wordpress/wp-content/plugins/basic-auth
+
+# Make pretty permalinks work so API is accessible
+COPY htaccess /var/www/html/wordpress/.htaccess

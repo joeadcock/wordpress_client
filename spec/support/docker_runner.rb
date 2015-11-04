@@ -28,6 +28,14 @@ module DockerRunner
     def running?
       @running
     end
+
+    def url
+      "http://#{host}:#{port}/wp-json"
+    end
+
+    # Defined in the dbdump in spec/docker/dbdump.sql.gz
+    def username() "test" end
+    def password() "test" end
   end
 
   private
