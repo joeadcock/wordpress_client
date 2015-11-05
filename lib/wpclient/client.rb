@@ -21,6 +21,11 @@ module Wpclient
       raise Wpclient::TimeoutError
     end
 
+    def get_post(id)
+      post = parse_json_response(connection.get("posts/#{id.to_i}"))
+      Post.new(post)
+    end
+
     def create_post(data)
       response = post_json("posts", data)
       if response.status == 201
@@ -55,7 +60,7 @@ module Wpclient
     end
 
     def parse_json_response(response)
-      raise Wpclient::ServerError, "Server returned #{response.status}" if response.status != 200
+      handle_status_code(response)
 
       content_type = response.headers["content-type"].split(";").first
       unless content_type == "application/json"
@@ -66,6 +71,18 @@ module Wpclient
 
     rescue JSON::ParserError => error
       raise Wpclient::ServerError, "Could not parse JSON response: #{error}"
+    end
+
+    def handle_status_code(response)
+      case response.status
+      when 200 then return
+
+      when 404
+        raise NotFoundError, "Could not find resource"
+
+      else
+        raise ServerError, "Server returned status code #{response.status}"
+      end
     end
   end
 end

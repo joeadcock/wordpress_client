@@ -9,9 +9,9 @@ describe "integration tests" do
     WebMock.allow_net_connect!
   end
 
-  it "can list posts" do
-    client = Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
+  let(:client) { Wpclient.new(url: @server.url, username: @server.username, password: @server.password) }
 
+  it "can list posts" do
     posts = client.posts(per_page: 1)
     expect(posts.size).to be 1
 
@@ -20,9 +20,20 @@ describe "integration tests" do
     expect(post.title).to eq "Hello world!"
   end
 
-  it "can create a post" do
-    client = Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
+  it "can get specific posts" do
+    posts = client.posts(per_page: 1)
+    expect(posts).to_not be_empty
 
+    first_post = posts.first
+
+    post = client.get_post(first_post.id)
+    expect(post.id).to eq first_post.id
+    expect(post.title).to eq first_post.title
+
+    expect { client.get_post(888888) }.to raise_error(Wpclient::NotFoundError)
+  end
+
+  it "can create a post" do
     data = {
       title: "A newly created post",
       status: "publish",

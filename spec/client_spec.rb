@@ -73,7 +73,32 @@ describe Wpclient::Client do
       )
       expect { make_client.posts }.to raise_error(Wpclient::ServerError, /401/i)
     end
+  end
 
+  describe "fetching a single post" do
+    it "GETS the post ID" do
+      client = make_client
+      post_fixture = json_fixture("simple-post.json")
+      id = post_fixture.fetch("id")
+
+      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}").to_return(
+        headers: {"content-type" => "application/json; charset=utf-8"},
+        body: post_fixture.to_json,
+      )
+
+      post = client.get_post(id)
+      expect(post).to be_instance_of(Wpclient::Post)
+      expect(post.id).to eq id
+      expect(post.title).to eq post_fixture.fetch("title").fetch("rendered")
+    end
+
+    it "raises a Wpclient::NotFoundError when post cannot be found" do
+      client = make_client
+
+      stub_request(:get, "#{base_url}/wp/v2/posts/5").to_return(status: 404)
+
+      expect { client.get_post(5) }.to raise_error(Wpclient::NotFoundError)
+    end
   end
 
   describe "creating a post" do
