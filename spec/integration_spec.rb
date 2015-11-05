@@ -21,14 +21,11 @@ describe "integration tests" do
   end
 
   it "can get specific posts" do
-    posts = client.posts(per_page: 1)
-    expect(posts).to_not be_empty
+    existing_post = find_existing_post
 
-    first_post = posts.first
-
-    post = client.get_post(first_post.id)
-    expect(post.id).to eq first_post.id
-    expect(post.title).to eq first_post.title
+    found_post = client.get_post(existing_post.id)
+    expect(found_post.id).to eq existing_post.id
+    expect(found_post.title).to eq existing_post.title
 
     expect { client.get_post(888888) }.to raise_error(Wpclient::NotFoundError)
   end
@@ -62,5 +59,19 @@ describe "integration tests" do
 
     expect(post.id).to eq data[:id]
     expect(post.title).to eq data[:title]
+  end
+
+  it "can update a post" do
+    post = find_existing_post
+
+    client.update_post(post.id, title: "Updated title")
+
+    expect(client.get_post(post.id).title).to eq "Updated title"
+  end
+
+  def find_existing_post
+    posts = client.posts(per_page: 1)
+    expect(posts).to_not be_empty
+    posts.first
   end
 end

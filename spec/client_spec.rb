@@ -30,18 +30,18 @@ describe Wpclient::Client do
     end
 
     it "maps posts into Post instances" do
-      fixture_post = json_fixture("simple-post.json")
+      post_fixture = json_fixture("simple-post.json")
 
       stub_request(:get, %r{.}).to_return(
         headers: {"content-type" => "application/json"},
-        body: [fixture_post].to_json,
+        body: [post_fixture].to_json,
       )
 
       client = Wpclient.new(url: "http://example.com/", username: "x", password: "x")
       post = client.posts.first
 
       expect(post).to be_instance_of(Wpclient::Post)
-      expect(post.id).to eq fixture_post.fetch("id")
+      expect(post.id).to eq post_fixture.fetch("id")
     end
 
     it "raises an Wpclient::TimeoutError when request times out" do
@@ -89,7 +89,7 @@ describe Wpclient::Client do
       post = client.get_post(id)
       expect(post).to be_instance_of(Wpclient::Post)
       expect(post.id).to eq id
-      expect(post.title).to eq post_fixture.fetch("title").fetch("rendered")
+      expect(post.title).to eq Wpclient::Post.new(post_fixture).title
     end
 
     it "raises a Wpclient::NotFoundError when post cannot be found" do
@@ -146,6 +146,26 @@ describe Wpclient::Client do
       response = client.create_post(title: "Foo", id: id)
       expect(response).to be_instance_of(Wpclient::Post)
       expect(response.id).to eq id
+    end
+  end
+
+  describe "updating a post" do
+    it "sends the diff as a PATCH on the post resource" do
+      client = make_client
+      post_fixture = json_fixture("simple-post.json")
+      encoding = "".encoding
+
+      stub_request(:patch, "#{base_url}/wp/v2/posts/42").with(
+        headers: {"content-type" => "application/json; charset=#{encoding}"},
+        body: {title: "New title"}.to_json,
+      ).to_return(
+        headers: {"content-type" => "application/json"},
+        body: post_fixture.to_json,
+      )
+
+      post = client.update_post(42, title: "New title")
+      expect(post).to be_instance_of(Wpclient::Post)
+      expect(post.title).to eq Wpclient::Post.new(post_fixture).title
     end
   end
 
