@@ -21,6 +21,14 @@ module Wpclient
       raise Wpclient::TimeoutError
     end
 
+    def create_post(data)
+      response = post_json("posts", data)
+      if response.status == 201
+        post = parse_json_response(connection.get(response.headers.fetch("location")))
+        Post.new(post)
+      end
+    end
+
     def inspect
       "#<Wpclient::Client #@username @ #@url>"
     end
@@ -34,6 +42,15 @@ module Wpclient
       Faraday.new(url: "#{url}/wp/v2") do |conn|
         conn.request :basic_auth, username, @password
         conn.adapter :net_http
+      end
+    end
+
+    def post_json(path, data)
+      json = data.to_json
+      connection.post do |request|
+        request.url path
+        request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
+        request.body = json
       end
     end
 

@@ -74,8 +74,42 @@ describe Wpclient::Client do
       expect { make_client.posts }.to raise_error(Wpclient::ServerError, /401/i)
     end
 
-    def make_client
-      Wpclient.new(url: "http://example.com", username: "x", password: "x")
+  end
+
+  describe "creating a post" do
+    it "POSTS the data to the server" do
+      client = make_client
+      post_fixture = json_fixture("simple-post.json")
+      id = post_fixture.fetch("id")
+      encoding = "".encoding
+
+      stub_request(:post, "#{base_url}/wp/v2/posts").with(
+        headers: {"content-type" => "application/json; charset=#{encoding}"},
+        body: {"title" => "Foo"}.to_json,
+      ).to_return(
+        status: 201, # Created
+        headers: {
+          "Content-Type" => "application/json; charset=utf-8",
+          "Location" => "#{base_url}/wp/v2/posts/#{id}"
+        }
+      )
+
+      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}").to_return(
+        headers: {"content-type" => "application/json; charset=utf-8"},
+        body: post_fixture.to_json,
+      )
+
+      response = client.create_post(title: "Foo")
+      expect(response).to be_instance_of(Wpclient::Post)
+      expect(response.id).to eq id
     end
+  end
+
+  def make_client
+    Wpclient.new(url: "http://example.com", username: "x", password: "x")
+  end
+
+  def base_url
+    "http://x:x@example.com"
   end
 end

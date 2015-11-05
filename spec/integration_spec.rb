@@ -28,10 +28,9 @@ describe "integration tests" do
       status: "publish",
     }
 
-    pending "Need to create #create_post"
     post = client.create_post(data)
 
-    expect(post.id).to be_instance_of Integer
+    expect(post.id).to be_kind_of Integer
 
     # Try to find the post to determine if it was persisted or not
     all_posts = client.posts(per_page: 100)
