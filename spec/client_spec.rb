@@ -128,6 +128,25 @@ describe Wpclient::Client do
       expect(response).to be_instance_of(Wpclient::Post)
       expect(response.id).to eq id
     end
+
+    it "PUTS the data to the server if an ID is given" do
+      client = make_client
+      post_fixture = json_fixture("simple-post.json")
+      id = post_fixture.fetch("id")
+      encoding = "".encoding
+
+      stub_request(:put, "#{base_url}/wp/v2/posts/#{id}").with(
+        headers: {"content-type" => "application/json; charset=#{encoding}"},
+        body: {"title" => "Foo"}.to_json,
+      ).to_return(
+        headers: {"content-type" => "application/json; charset=utf-8"},
+        body: post_fixture.to_json,
+      )
+
+      response = client.create_post(title: "Foo", id: id)
+      expect(response).to be_instance_of(Wpclient::Post)
+      expect(response.id).to eq id
+    end
   end
 
   def make_client

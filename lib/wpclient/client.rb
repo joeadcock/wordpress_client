@@ -27,10 +27,10 @@ module Wpclient
     end
 
     def create_post(data)
-      response = post_json("posts", data)
-      if response.status == 201
-        post = parse_json_response(connection.get(response.headers.fetch("location")))
-        Post.new(post)
+      if data[:id]
+        replace_post(data[:id].to_i, data.reject { |key,| key == :id })
+      else
+        create_new_post(data)
       end
     end
 
@@ -39,6 +39,19 @@ module Wpclient
     end
 
     private
+    def create_new_post(data)
+      response = post_json("posts", data)
+      if response.status == 201
+        post = parse_json_response(connection.get(response.headers.fetch("location")))
+        Post.new(post)
+      end
+    end
+
+    def replace_post(id, data)
+      post = parse_json_response(post_json("posts/#{id}", data, method: :put))
+      Post.new(post)
+    end
+
     def connection
       @connection ||= create_connection
     end
@@ -50,9 +63,9 @@ module Wpclient
       end
     end
 
-    def post_json(path, data)
+    def post_json(path, data, method: :post)
       json = data.to_json
-      connection.post do |request|
+      connection.public_send(method) do |request|
         request.url path
         request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
         request.body = json
@@ -81,7 +94,7 @@ module Wpclient
         raise NotFoundError, "Could not find resource"
 
       else
-        raise ServerError, "Server returned status code #{response.status}"
+        raise ServerError, "Server returned status code #{response.status}: #{response.body}"
       end
     end
   end
