@@ -77,7 +77,12 @@ module DockerRunner
       docker rm #{container_id.shellescape}
     }
     unless $?.success?
-      raise "Could not clean up docker image #{container_id}. Output was:\n#{output}.\n"
+      message = "Could not clean up docker image #{container_id}. Output was:\n#{output}.\n"
+      if ENV["CIRCLECI"]
+        puts message
+      else
+        raise message
+      end
     end
   end
 
