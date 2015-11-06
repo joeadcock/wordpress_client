@@ -1,6 +1,9 @@
 require "spec_helper"
 
 describe Wpclient::Client do
+  let(:client) { Wpclient.new(url: "http://example.com", username: "x", password: "x") }
+  let(:base_url) { "http://x:x@example.com" }
+
   it "is initialized with connection details" do
     client = Wpclient.new(url: "https://example.com/wp-json/", username: "user", password: "secret")
     expect(client.url).to eq "https://example.com/wp-json/"
@@ -46,7 +49,7 @@ describe Wpclient::Client do
 
     it "raises an Wpclient::TimeoutError when request times out" do
       stub_request(:get, %r{.}).to_timeout
-      expect { make_client.posts }.to raise_error(Wpclient::TimeoutError)
+      expect { client.posts }.to raise_error(Wpclient::TimeoutError)
     end
 
     it "raises an Wpclient::ServerError when request body is broken" do
@@ -54,7 +57,7 @@ describe Wpclient::Client do
         headers: {"content-type" => "application/json"},
         body: "[",
       )
-      expect { make_client.posts }.to raise_error(Wpclient::ServerError, /parse/i)
+      expect { client.posts }.to raise_error(Wpclient::ServerError, /parse/i)
     end
 
     it "raises an Wpclient::ServerError when response body isn't JSON" do
@@ -62,7 +65,7 @@ describe Wpclient::Client do
         headers: {"content-type" => "text/html"},
         body: "[]",
       )
-      expect { make_client.posts }.to raise_error(Wpclient::ServerError, /html/i)
+      expect { client.posts }.to raise_error(Wpclient::ServerError, /html/i)
     end
 
     it "raises an Wpclient::ServerError when response isn't OK" do
@@ -71,13 +74,12 @@ describe Wpclient::Client do
         headers: {"content-type" => "application/json"},
         body: "[]",
       )
-      expect { make_client.posts }.to raise_error(Wpclient::ServerError, /401/i)
+      expect { client.posts }.to raise_error(Wpclient::ServerError, /401/i)
     end
   end
 
   describe "fetching a single post" do
     it "GETS the post ID" do
-      client = make_client
       post_fixture = json_fixture("simple-post.json")
       id = post_fixture.fetch("id")
 
@@ -93,8 +95,6 @@ describe Wpclient::Client do
     end
 
     it "raises a Wpclient::NotFoundError when post cannot be found" do
-      client = make_client
-
       stub_request(:get, "#{base_url}/wp/v2/posts/5").to_return(status: 404)
 
       expect { client.get_post(5) }.to raise_error(Wpclient::NotFoundError)
@@ -103,7 +103,6 @@ describe Wpclient::Client do
 
   describe "creating a post" do
     it "POSTS the data to the server" do
-      client = make_client
       post_fixture = json_fixture("simple-post.json")
       id = post_fixture.fetch("id")
       encoding = "".encoding
@@ -138,7 +137,6 @@ describe Wpclient::Client do
         body: error_contents.to_json,
       )
 
-      client = make_client
       expect {
         client.create_post({})
       }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
@@ -147,7 +145,6 @@ describe Wpclient::Client do
 
   describe "updating a post" do
     it "sends the diff as a PATCH on the post resource" do
-      client = make_client
       post_fixture = json_fixture("simple-post.json")
       encoding = "".encoding
 
@@ -173,7 +170,6 @@ describe Wpclient::Client do
         body: error_contents.to_json,
       )
 
-      client = make_client
       expect {
         client.update_post(1, {})
       }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
@@ -188,18 +184,9 @@ describe Wpclient::Client do
         body: error_contents.to_json,
       )
 
-      client = make_client
       expect {
         client.update_post(1, {})
       }.to raise_error(Wpclient::NotFoundError, "Post ID is not found")
     end
-  end
-
-  def make_client
-    Wpclient.new(url: "http://example.com", username: "x", password: "x")
-  end
-
-  def base_url
-    "http://x:x@example.com"
   end
 end
