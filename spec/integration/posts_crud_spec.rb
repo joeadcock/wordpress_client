@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "integration tests" do
+describe "Posts (CRUD)" do
   before(:all) do
     @server = start_wordpress_server
   end
