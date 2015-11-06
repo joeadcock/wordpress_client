@@ -2,6 +2,8 @@
 
 wpclient is a simple client to the Wordpress API.
 
+[![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient)
+
 ## Usage
 
 Initialize a client with a username, password and API URL. You can then search for posts.
