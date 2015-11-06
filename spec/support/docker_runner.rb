@@ -22,6 +22,8 @@ module DockerRunner
 
     # Defined in the dbdump in spec/docker/dbdump.sql.gz
     def username() "test" end
+
+    # Defined in the dbdump in spec/docker/dbdump.sql.gz
     def password() "test" end
   end
 
@@ -38,7 +40,7 @@ module DockerRunner
     print "Waiting for container to start..."
 
     begin
-      wait_for_container_to_start(container_id, port: port, host: host)
+      wait_for_container_to_start(port: port, host: host)
     rescue
       kill_container container_id
       raise $!
@@ -50,8 +52,11 @@ module DockerRunner
   end
 
   def fail_if_docker_missing
-    unless system("hash docker > /dev/null")
-      STDERR.puts "It does not look like you have docker installed. Please install docker so you can run integration tests."
+    unless system("hash docker > /dev/null 2> /dev/null")
+      STDERR.puts(
+        "It does not look like you have docker installed. " \
+        "Please install docker so you can run integration tests."
+      )
       fail "No docker installed"
     end
   end
@@ -63,7 +68,12 @@ module DockerRunner
   end
 
   def start_container(port:)
-    output = %x{docker run -dit -p #{port.to_i}:80 -e WORDPRESS_HOST="#{docker_host.shellescape}:#{port.to_i}" wpclient-test}
+    output = `
+      docker run \
+        -dit -p #{port.to_i}:80 \
+        -e WORDPRESS_HOST="#{docker_host.shellescape}:#{port.to_i}" \
+        wpclient-test
+    `
     if $?.success?
       output.chomp
     else
@@ -72,10 +82,11 @@ module DockerRunner
   end
 
   def kill_container(container_id)
-    output = %x{
+    output = `
       docker kill #{container_id.shellescape};
       docker rm #{container_id.shellescape}
-    }
+    `
+
     unless $?.success?
       message = "Could not clean up docker image #{container_id}. Output was:\n#{output}.\n"
       if ENV["CIRCLECI"]
@@ -86,7 +97,7 @@ module DockerRunner
     end
   end
 
-  def wait_for_container_to_start(container_id, port:, host:)
+  def wait_for_container_to_start(port:, host:)
     # Try to connect to the webserver in a loop until we successfully connect,
     # the container process dies, or the timeout is reached.
     timeout = 60

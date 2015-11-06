@@ -9,7 +9,9 @@ describe "Posts (CRUD)" do
     WebMock.allow_net_connect!
   end
 
-  let(:client) { Wpclient.new(url: @server.url, username: @server.username, password: @server.password) }
+  let(:client) {
+    Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
+  }
 
   it "can list posts" do
     posts = client.posts(per_page: 1)

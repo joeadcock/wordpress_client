@@ -35,7 +35,7 @@ describe Wpclient::Client do
     it "maps posts into Post instances" do
       post_fixture = json_fixture("simple-post.json")
 
-      stub_request(:get, %r{.}).to_return(
+      stub_request(:get, /./).to_return(
         headers: {"content-type" => "application/json"},
         body: [post_fixture].to_json,
       )
@@ -48,12 +48,12 @@ describe Wpclient::Client do
     end
 
     it "raises an Wpclient::TimeoutError when request times out" do
-      stub_request(:get, %r{.}).to_timeout
+      stub_request(:get, /./).to_timeout
       expect { client.posts }.to raise_error(Wpclient::TimeoutError)
     end
 
     it "raises an Wpclient::ServerError when request body is broken" do
-      stub_request(:get, %r{.}).to_return(
+      stub_request(:get, /./).to_return(
         headers: {"content-type" => "application/json"},
         body: "[",
       )
@@ -61,7 +61,7 @@ describe Wpclient::Client do
     end
 
     it "raises an Wpclient::ServerError when response body isn't JSON" do
-      stub_request(:get, %r{.}).to_return(
+      stub_request(:get, /./).to_return(
         headers: {"content-type" => "text/html"},
         body: "[]",
       )
@@ -69,7 +69,7 @@ describe Wpclient::Client do
     end
 
     it "raises an Wpclient::ServerError when response isn't OK" do
-      stub_request(:get, %r{.}).to_return(
+      stub_request(:get, /./).to_return(
         status: 401,
         headers: {"content-type" => "application/json"},
         body: "[]",
@@ -131,7 +131,7 @@ describe Wpclient::Client do
     it "raises validation error when post could not be created" do
       error_contents = json_fixture("validation-error.json")
 
-      stub_request(:any, %r{.}).to_return(
+      stub_request(:any, /./).to_return(
         status: 400,
         headers: {"content-type" => "application/json"},
         body: error_contents.to_json,
@@ -164,7 +164,7 @@ describe Wpclient::Client do
     it "raises ValidationError when server rejects changes" do
       error_contents = json_fixture("validation-error.json")
 
-      stub_request(:any, %r{.}).to_return(
+      stub_request(:any, /./).to_return(
         status: 400,
         headers: {"content-type" => "application/json"},
         body: error_contents.to_json,
@@ -178,7 +178,7 @@ describe Wpclient::Client do
     it "raises NotFound when trying to update non-existing ID" do
       error_contents = json_fixture("invalid-post-id.json")
 
-      stub_request(:any, %r{.}).to_return(
+      stub_request(:any, /./).to_return(
         status: 400,
         headers: {"content-type" => "application/json"},
         body: error_contents.to_json,
