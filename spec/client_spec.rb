@@ -128,6 +128,21 @@ describe Wpclient::Client do
       expect(response).to be_instance_of(Wpclient::Post)
       expect(response.id).to eq id
     end
+
+    it "raises validation error when post could not be created" do
+      error_contents = json_fixture("validation-error.json")
+
+      stub_request(:any, %r{.}).to_return(
+        status: 400,
+        headers: {"content-type" => "application/json"},
+        body: error_contents.to_json,
+      )
+
+      client = make_client
+      expect {
+        client.create_post({})
+      }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
+    end
   end
 
   describe "updating a post" do

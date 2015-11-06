@@ -46,6 +46,12 @@ describe "integration tests" do
     expect(all_posts.map(&:title)).to include "A newly created post"
   end
 
+  it "raises a validation error if post could not be saved" do
+    expect {
+      client.create_post(status: "not really valid")
+    }.to raise_error(Wpclient::ValidationError, /status/)
+  end
+
   it "can update a post" do
     post = find_existing_post
 

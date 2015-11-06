@@ -18,7 +18,7 @@ module Wpclient
         Post.new(post)
       end
     rescue Faraday::TimeoutError
-      raise Wpclient::TimeoutError
+      raise TimeoutError
     end
 
     def get_post(id)
@@ -31,6 +31,11 @@ module Wpclient
       if response.status == 201
         post = parse_json_response(connection.get(response.headers.fetch("location")))
         Post.new(post)
+      else
+        handle_status_code(response)
+        # If we get here, the status code was successful, but not 201 (handled
+        # above). This should not happen.
+        raise ServerError, "Got unexpected response from server: #{response.status}"
       end
     end
 
@@ -69,13 +74,13 @@ module Wpclient
 
       content_type = response.headers["content-type"].split(";").first
       unless content_type == "application/json"
-        raise Wpclient::ServerError, "Got content type #{content_type}"
+        raise ServerError, "Got content type #{content_type}"
       end
 
       JSON.parse(response.body)
 
     rescue JSON::ParserError => error
-      raise Wpclient::ServerError, "Could not parse JSON response: #{error}"
+      raise ServerError, "Could not parse JSON response: #{error}"
     end
 
     def handle_status_code(response)
@@ -85,9 +90,18 @@ module Wpclient
       when 404
         raise NotFoundError, "Could not find resource"
 
+      when 400
+        raise ValidationError, validation_error_message(response)
+
       else
         raise ServerError, "Server returned status code #{response.status}: #{response.body}"
       end
+    end
+
+    def validation_error_message(response)
+      JSON.parse(response.body).first.fetch("message")
+    rescue
+      "Bad request"
     end
   end
 end
