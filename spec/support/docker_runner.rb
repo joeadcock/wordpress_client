@@ -63,7 +63,7 @@ module DockerRunner
   end
 
   def start_container(port:)
-    output = %x{docker run -d -p #{port.to_i}:80 -it wpclient-test}
+    output = %x{docker run -dit -p #{port.to_i}:80 -e WORDPRESS_HOST="#{docker_host.shellescape}:#{port.to_i}" wpclient-test}
     if $?.success?
       output.chomp
     else
@@ -91,11 +91,12 @@ module DockerRunner
       fail "Timed out while waiting for the container to start" if Time.now - start > timeout
 
       begin
-        Socket.tcp(host, port, connect_timeout: 1) { |socket| return }
-      rescue Errno::ECONNREFUSED
+        response = Faraday.get("http://#{host}:#{port}/")
+        return if response.status == 200
+      rescue Faraday::ConnectionFailed
         # Server not yet started. Just wait it out...
-        sleep 1
       end
+      sleep 0.5
     end
   end
 
