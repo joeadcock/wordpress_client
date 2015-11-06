@@ -91,17 +91,27 @@ module Wpclient
         raise NotFoundError, "Could not find resource"
 
       when 400
-        raise ValidationError, validation_error_message(response)
+        handle_bad_request(response)
 
       else
         raise ServerError, "Server returned status code #{response.status}: #{response.body}"
       end
     end
 
-    def validation_error_message(response)
-      JSON.parse(response.body).first.fetch("message")
+    def handle_bad_request(response)
+      code, message = bad_request_details(response)
+      if code == "rest_post_invalid_id"
+        raise NotFoundError, "Post ID is not found"
+      else
+        raise ValidationError, message
+      end
+    end
+
+    def bad_request_details(response)
+      details = JSON.parse(response.body).first
+      [details["code"], details["message"]]
     rescue
-      "Bad request"
+      [nil, "Bad Request"]
     end
   end
 end

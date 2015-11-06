@@ -163,6 +163,36 @@ describe Wpclient::Client do
       expect(post).to be_instance_of(Wpclient::Post)
       expect(post.title).to eq Wpclient::Post.new(post_fixture).title
     end
+
+    it "raises ValidationError when server rejects changes" do
+      error_contents = json_fixture("validation-error.json")
+
+      stub_request(:any, %r{.}).to_return(
+        status: 400,
+        headers: {"content-type" => "application/json"},
+        body: error_contents.to_json,
+      )
+
+      client = make_client
+      expect {
+        client.update_post(1, {})
+      }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
+    end
+
+    it "raises NotFound when trying to update non-existing ID" do
+      error_contents = json_fixture("invalid-post-id.json")
+
+      stub_request(:any, %r{.}).to_return(
+        status: 400,
+        headers: {"content-type" => "application/json"},
+        body: error_contents.to_json,
+      )
+
+      client = make_client
+      expect {
+        client.update_post(1, {})
+      }.to raise_error(Wpclient::NotFoundError, "Post ID is not found")
+    end
   end
 
   def make_client
