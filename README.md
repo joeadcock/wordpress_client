@@ -24,11 +24,8 @@ data = {
   # ...
 }
 
-# POSTs the data and gets the result back
 post = client.create_post(data) # => Wpclient::Post
-
-# PUT the same data on the newly created post.
-client.create_post(data.merge(id: post.id))
+updated_post = client.update_post(post.id, title: "Updated") # => Wpclient::Post
 ```
 
 ## Running tests

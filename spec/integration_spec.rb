@@ -46,21 +46,6 @@ describe "integration tests" do
     expect(all_posts.map(&:title)).to include "A newly created post"
   end
 
-  it "can create a post at a specific ID" do
-    data = {
-      id: 4567,
-      title: "A replaced post",
-      status: "publish",
-    }
-
-    # See https://github.com/WP-API/WP-API/issues/1716
-    pending "WP API does not actually support PUT this way."
-    post = client.create_post(data)
-
-    expect(post.id).to eq data[:id]
-    expect(post.title).to eq data[:title]
-  end
-
   it "can update a post" do
     post = find_existing_post
 

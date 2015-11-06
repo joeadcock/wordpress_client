@@ -27,10 +27,10 @@ module Wpclient
     end
 
     def create_post(data)
-      if data[:id]
-        replace_post(data[:id].to_i, data.reject { |key,| key == :id })
-      else
-        create_new_post(data)
+      response = post_json("posts", data)
+      if response.status == 201
+        post = parse_json_response(connection.get(response.headers.fetch("location")))
+        Post.new(post)
       end
     end
 
@@ -44,19 +44,6 @@ module Wpclient
     end
 
     private
-    def create_new_post(data)
-      response = post_json("posts", data)
-      if response.status == 201
-        post = parse_json_response(connection.get(response.headers.fetch("location")))
-        Post.new(post)
-      end
-    end
-
-    def replace_post(id, data)
-      post = parse_json_response(post_json("posts/#{id}", data, method: :put))
-      Post.new(post)
-    end
-
     def connection
       @connection ||= create_connection
     end
