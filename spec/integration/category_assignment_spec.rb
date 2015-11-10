@@ -25,9 +25,19 @@ describe "Category assignment" do
   end
 
   it "can be set for multiple categories when creating a post" do
-    category = client.create_category(name: "Assignment test")
+    category = client.create_category(name: "Assignment test 1")
     post = client.create_post(category_ids: [category.id], title: "Assignment test")
 
+    expect(post.categories).to eq [category]
+  end
+
+  it "can be changed when updating a post" do
+    category = client.create_category(name: "Assignment test 2")
+    post = find_existing_post
+
+    client.update_post(post.id, category_ids: [category.id])
+
+    post = client.get_post(post.id)
     expect(post.categories).to eq [category]
   end
 

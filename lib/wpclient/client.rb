@@ -63,9 +63,10 @@ module Wpclient
       Category.parse(category)
     end
 
-    def update_post(id, data)
-      post = parse_json_response(post_json("posts/#{id.to_i}", data, method: :patch))
-      Post.new(post)
+    def update_post(id, attributes)
+      post_data = parse_json_response(post_json("posts/#{id.to_i}?_embed", attributes, method: :patch))
+      post = Post.new(post_data)
+      assign_categories(post, attributes[:category_ids])
     end
 
     def update_category(id, attributes)
