@@ -12,9 +12,7 @@ module Wpclient
     end
 
     def posts(per_page: 10, page: 1)
-      parse_json_response(
-        connection.get("posts", page: page, per_page: per_page)
-      ).map do |post|
+      get_json("posts", page: page, per_page: per_page, _embed: nil).map do |post|
         Post.new(post)
       end
     rescue Faraday::TimeoutError
@@ -22,12 +20,12 @@ module Wpclient
     end
 
     def get_post(id)
-      post = parse_json_response(connection.get("posts/#{id.to_i}"))
+      post = get_json("posts/#{id.to_i}", _embed: nil)
       Post.new(post)
     end
 
     def find_by_slug(slug)
-      posts = parse_json_response(connection.get("posts", filter: {name: slug}))
+      posts = get_json("posts", filter: {name: slug}, _embed: nil)
       if posts.size > 0
         Post.new(posts.first)
       else
@@ -38,7 +36,7 @@ module Wpclient
     def create_post(data)
       response = post_json("posts", data)
       if response.status == 201
-        post = parse_json_response(connection.get(response.headers.fetch("location")))
+        post = get_json(response.headers.fetch("location"), _embed: nil)
         Post.new(post)
       else
         handle_status_code(response)
@@ -76,6 +74,10 @@ module Wpclient
         request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
         request.body = json
       end
+    end
+
+    def get_json(path, params = {})
+      parse_json_response(connection.get(path, params))
     end
 
     def parse_json_response(response)
