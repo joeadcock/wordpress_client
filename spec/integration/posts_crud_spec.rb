@@ -1,12 +1,11 @@
 require "spec_helper"
 
 describe "Posts (CRUD)" do
-  before(:all) { @server = start_wordpress_server }
-  after(:all) { @server.stop if @server }
   before { WebMock.allow_net_connect! }
 
   let(:client) {
-    Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
+    server = WordpressServer.instance
+    Wpclient.new(url: server.url, username: server.username, password: server.password)
   }
 
   it "can list posts" do
