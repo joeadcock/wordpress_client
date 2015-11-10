@@ -1,13 +1,9 @@
 require "spec_helper"
 
 describe "Posts (CRUD)" do
-  before(:all) do
-    @server = start_wordpress_server
-  end
-
-  before do
-    WebMock.allow_net_connect!
-  end
+  before(:all) { @server = start_wordpress_server }
+  after(:all) { @server.stop if @server }
+  before { WebMock.allow_net_connect! }
 
   let(:client) {
     Wpclient.new(url: @server.url, username: @server.username, password: @server.password)
