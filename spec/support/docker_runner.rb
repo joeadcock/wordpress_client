@@ -12,7 +12,7 @@ module DockerRunner
     system("docker images | grep -q '^#{name.shellescape} '")
   end
 
-  def build_image(name, path: Dir.cwd)
+  def build_image(name, path: Dir.pwd)
     system("cd #{path.shellescape} && docker build -t #{name.shellescape} .")
   end
 
