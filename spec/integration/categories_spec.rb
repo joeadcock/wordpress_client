@@ -20,4 +20,14 @@ describe "Categories" do
 
     expect(post.category_ids).to eq post.categories.map(&:id)
   end
+
+  it "can be listed" do
+    categories = client.categories
+    expect(categories.size).to be > 0
+
+    category = categories.first
+    expect(category.id).to be_kind_of(Integer)
+    expect(category.name).to be_instance_of(String)
+    expect(category.slug).to be_instance_of(String)
+  end
 end

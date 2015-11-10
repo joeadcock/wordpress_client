@@ -19,6 +19,12 @@ module Wpclient
       raise TimeoutError
     end
 
+    def categories(per_page: 10, page: 1)
+      get_json("terms/category", page: page, per_page: per_page).map do |category|
+        Category.parse(category)
+      end
+    end
+
     def get_post(id)
       post = get_json("posts/#{id.to_i}", _embed: nil)
       Post.new(post)
