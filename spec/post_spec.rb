@@ -26,6 +26,16 @@ describe Wpclient::Post do
     expect(post.updated_at).to_not be nil
   end
 
+  it "parses categories" do
+    post = Wpclient::Post.new(fixture)
+
+    expect(post.categories).to eq [
+      Wpclient::Category.new(
+        id: 1, name: "Uncategorized", slug: "uncategorized"
+      )
+    ]
+  end
+
   describe "dates" do
     it "uses GMT times if available" do
       post = Wpclient::Post.new(fixture.merge(
