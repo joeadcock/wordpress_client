@@ -31,6 +31,11 @@ describe "Categories" do
     expect(category.slug).to be_instance_of(String)
   end
 
+  it "can be found" do
+    existing = find_existing_category
+    expect(client.find_category(existing.id)).to eq existing
+  end
+
   it "can be created" do
     category = client.create_category(name: "New category")
 
@@ -39,5 +44,17 @@ describe "Categories" do
     expect(category.slug).to eq "new-category"
 
     expect(client.categories(per_page: 100).map(&:name)).to include "New category"
+  end
+
+  it "can be updated" do
+    existing = find_existing_category
+    client.update_category(existing.id, name: "Updated name")
+    expect(client.find_category(existing.id).name).to eq "Updated name"
+  end
+
+  def find_existing_category
+    categories = client.categories(per_page: 1)
+    expect(categories).to_not be_empty
+    categories.first
   end
 end

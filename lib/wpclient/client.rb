@@ -39,6 +39,11 @@ module Wpclient
       end
     end
 
+    def find_category(id)
+      category = get_json("terms/category/#{id.to_i}")
+      Category.parse(category)
+    end
+
     def create_post(data)
       response = post_json("posts", data)
       if response.status == 201
@@ -60,6 +65,13 @@ module Wpclient
     def update_post(id, data)
       post = parse_json_response(post_json("posts/#{id.to_i}", data, method: :patch))
       Post.new(post)
+    end
+
+    def update_category(id, attributes)
+      category = parse_json_response(
+        post_json("terms/category/#{id.to_i}", attributes, method: :patch)
+      )
+      Category.parse(category)
     end
 
     def inspect
