@@ -44,11 +44,12 @@ module Wpclient
       Category.parse(category)
     end
 
-    def create_post(data)
-      response = post_json("posts", data)
+    def create_post(attributes)
+      response = post_json("posts", attributes)
       if response.status == 201
-        post = get_json(response.headers.fetch("location"), _embed: nil)
-        Post.new(post)
+        data = get_json(response.headers.fetch("location"), _embed: nil)
+        post = Post.new(data)
+        assign_categories(post, attributes[:category_ids])
       else
         handle_status_code(response)
         # If we get here, the status code was successful, but not 201 (handled
@@ -74,11 +75,41 @@ module Wpclient
       Category.parse(category)
     end
 
+    def assign_category_to_post(post:, category_id:)
+      response = post_json("posts/#{post.id}/terms/category/#{category_id}", {})
+      if response.status == 201 # Created
+        true
+      else
+        handle_status_code(response)
+        # If we get here, the status code was successful, but not 201 (handled
+        # above). This should not happen.
+        raise ServerError, "Got unexpected response from server: #{response.status}"
+      end
+    end
+
+    def remove_category_from_post(post:, category_id:)
+      response = post_json(
+        "posts/#{post.id}/terms/category/#{category_id}",
+        {force: true},
+        method: :delete
+      )
+      handle_status_code(response)
+    end
+
     def inspect
       "#<Wpclient::Client #@username @ #@url>"
     end
 
     private
+    def assign_categories(post, category_ids)
+      if category_ids.nil?
+        post
+      else
+        ReplaceCategories.call(self, post, category_ids)
+        get_post(post.id)
+      end
+    end
+
     def connection
       @connection ||= create_connection
     end

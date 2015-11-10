@@ -25,5 +25,9 @@ module Wpclient
         super
       end
     end
+
+    def inspect
+      "#<Wpclient::Category ##{id} #{name.inspect} (#{slug})>"
+    end
   end
 end
