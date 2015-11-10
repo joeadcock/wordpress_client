@@ -30,4 +30,14 @@ describe "Categories" do
     expect(category.name).to be_instance_of(String)
     expect(category.slug).to be_instance_of(String)
   end
+
+  it "can be created" do
+    category = client.create_category(name: "New category")
+
+    expect(category.id).to be_kind_of(Integer)
+    expect(category.name).to eq "New category"
+    expect(category.slug).to eq "new-category"
+
+    expect(client.categories(per_page: 100).map(&:name)).to include "New category"
+  end
 end
