@@ -148,7 +148,7 @@ describe Wpclient::Client do
       post_fixture = json_fixture("simple-post.json")
       encoding = "".encoding
 
-      stub_request(:patch, "#{base_url}/wp/v2/posts/42").with(
+      stub_request(:patch, "#{base_url}/wp/v2/posts/42?_embed=").with(
         headers: {"content-type" => "application/json; charset=#{encoding}"},
         body: {title: "New title"}.to_json,
       ).to_return(
