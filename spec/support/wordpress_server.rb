@@ -14,7 +14,7 @@ class WordpressServer
   end
 
   def url
-    "http://#{host}:#{port}/wp-json"
+    "http://#{host_with_port}/wp-json"
   end
 
   # Defined in the dbdump in spec/docker/dbdump.sql.gz
@@ -24,6 +24,10 @@ class WordpressServer
   def password() "test" end
 
   private
+  def host_with_port
+    "#{host}:#{port}"
+  end
+
   def docker_host
     if ENV['DOCKER_HOST']
       URI.parse(ENV['DOCKER_HOST']).host
@@ -67,7 +71,7 @@ class WordpressServer
     DockerRunner.run_container(
       "wpclient-test",
       port: port,
-      environment: {wordpress_host: url}
+      environment: {wordpress_host: host_with_port}
     )
   end
 
