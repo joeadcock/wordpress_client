@@ -34,6 +34,8 @@ describe Wpclient::Post do
         id: 1, name: "Uncategorized", slug: "uncategorized"
       )
     ]
+
+    expect(post.category_ids).to eq [1]
   end
 
   describe "dates" do

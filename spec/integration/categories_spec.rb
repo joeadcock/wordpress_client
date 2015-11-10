@@ -17,5 +17,7 @@ describe "Categories" do
     expect(category.id).to be_kind_of(Integer)
     expect(category.name).to be_instance_of(String)
     expect(category.slug).to be_instance_of(String)
+
+    expect(post.category_ids).to eq post.categories.map(&:id)
   end
 end

@@ -24,6 +24,8 @@ module Wpclient
       @categories = read_categories(data)
     end
 
+    def category_ids() categories.map(&:id) end
+
     private
     def rendered(data, name)
       (data[name] || {})["rendered"]
