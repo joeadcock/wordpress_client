@@ -26,6 +26,15 @@ module Wpclient
       Post.new(post)
     end
 
+    def find_by_slug(slug)
+      posts = parse_json_response(connection.get("posts", filter: {name: slug}))
+      if posts.size > 0
+        Post.new(posts.first)
+      else
+        raise NotFoundError, "Could not find post with slug #{slug.to_s.inspect}"
+      end
+    end
+
     def create_post(data)
       response = post_json("posts", data)
       if response.status == 201
