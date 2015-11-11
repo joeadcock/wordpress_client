@@ -15,11 +15,11 @@ module Wpclient
 
     def replace
       categories_to_add.each do |id|
-        client.assign_category_to_post(post: post, category_id: id)
+        client.assign_category_to_post(post_id: post.id, category_id: id)
       end
 
       categories_to_remove.each do |id|
-        client.remove_category_from_post(post: post, category_id: id)
+        client.remove_category_from_post(post_id: post.id, category_id: id)
       end
     end
 

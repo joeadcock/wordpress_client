@@ -78,8 +78,8 @@ module Wpclient
       Category.parse(category)
     end
 
-    def assign_category_to_post(post:, category_id:)
-      response = post_json("posts/#{post.id}/terms/category/#{category_id}", {})
+    def assign_category_to_post(post_id:, category_id:)
+      response = post_json("posts/#{post_id}/terms/category/#{category_id}", {})
       if response.status == 201 # Created
         true
       else
@@ -90,9 +90,9 @@ module Wpclient
       end
     end
 
-    def remove_category_from_post(post:, category_id:)
+    def remove_category_from_post(post_id:, category_id:)
       response = post_json(
-        "posts/#{post.id}/terms/category/#{category_id}",
+        "posts/#{post_id}/terms/category/#{category_id}",
         {force: true},
         method: :delete
       )

@@ -12,15 +12,15 @@ describe "Category assignment" do
 
   it "is possible on a post" do
     new_category = client.create_category(name: "Post assignment 1")
-    client.assign_category_to_post(post: existing_post, category_id: new_category.id)
+    client.assign_category_to_post(post_id: existing_post.id, category_id: new_category.id)
     expect(client.get_post(existing_post.id).categories).to include new_category
   end
 
   it "can be removed on a post" do
     new_category = client.create_category(name: "Post assignment 2")
-    client.assign_category_to_post(post: existing_post, category_id: new_category.id)
+    client.assign_category_to_post(post_id: existing_post.id, category_id: new_category.id)
 
-    client.remove_category_from_post(post: existing_post, category_id: new_category.id)
+    client.remove_category_from_post(post_id: existing_post.id, category_id: new_category.id)
     expect(client.get_post(existing_post.id).categories).to_not include(new_category)
   end
 
