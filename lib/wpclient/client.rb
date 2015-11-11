@@ -43,17 +43,10 @@ module Wpclient
     end
 
     def create_post(attributes)
-      response = post_json("posts", attributes)
-      if response.status == 201
-        data = get_json(response.headers.fetch("location"), _embed: nil)
-        post = Post.new(data)
-        assign_categories(post, attributes[:category_ids])
-      else
-        handle_status_code(response)
-        # If we get here, the status code was successful, but not 201 (handled
-        # above). This should not happen.
-        raise ServerError, "Got unexpected response from server: #{response.status}"
-      end
+      response = assert_created(post_json("posts", attributes))
+      data = get_json(response.headers.fetch("location"), _embed: nil)
+      post = Post.new(data)
+      assign_categories(post, attributes[:category_ids])
     end
 
     def create_category(attributes)
@@ -77,15 +70,8 @@ module Wpclient
     end
 
     def assign_category_to_post(post_id:, category_id:)
-      response = post_json("posts/#{post_id}/terms/category/#{category_id}", {})
-      if response.status == 201 # Created
-        true
-      else
-        handle_status_code(response)
-        # If we get here, the status code was successful, but not 201 (handled
-        # above). This should not happen.
-        raise ServerError, "Got unexpected response from server: #{response.status}"
-      end
+      assert_created(post_json("posts/#{post_id}/terms/category/#{category_id}", {}))
+      true # Don't leak the response
     end
 
     def remove_category_from_post(post_id:, category_id:)
@@ -95,6 +81,7 @@ module Wpclient
         method: :delete
       )
       handle_status_code(response)
+      true # Don't leak the response
     end
 
     def inspect
@@ -155,16 +142,25 @@ module Wpclient
 
     def handle_status_code(response)
       case response.status
-      when 200 then return
-
+      when 200
+        return
       when 404
         raise NotFoundError, "Could not find resource"
-
       when 400
         handle_bad_request(response)
-
       else
         raise ServerError, "Server returned status code #{response.status}: #{response.body}"
+      end
+    end
+
+    def assert_created(response)
+      if response.status == 201 # Created
+        response
+      else
+        handle_status_code(response)
+        # If we get here, the status code was successful, but not the expected
+        # 201 Created (excluded above). This should not happen.
+        raise ServerError, "Got unexpected response from server: #{response.status}"
       end
     end
 
