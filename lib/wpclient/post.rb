@@ -51,7 +51,7 @@ module Wpclient
 
       # term_collections is an array of arrays with terms in them. We can see
       # the type of the "collection" by inspecting the first child's taxonomy.
-      term_collections.find { |terms|
+      term_collections.detect { |terms|
         terms.size > 0 && terms.first["taxonomy"] == type
       } || []
     end
