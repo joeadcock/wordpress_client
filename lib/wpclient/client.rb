@@ -15,8 +15,6 @@ module Wpclient
       get_json("posts", page: page, per_page: per_page, _embed: nil).map do |post|
         Post.new(post)
       end
-    rescue Faraday::TimeoutError
-      raise TimeoutError
     end
 
     def categories(per_page: 10, page: 1)
@@ -131,10 +129,14 @@ module Wpclient
         request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
         request.body = json
       end
+    rescue Faraday::TimeoutError
+      raise TimeoutError
     end
 
     def get_json(path, params = {})
       parse_json_response(connection.get(path, params))
+    rescue Faraday::TimeoutError
+      raise TimeoutError
     end
 
     def parse_json_response(response)
