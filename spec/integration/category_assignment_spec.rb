@@ -13,7 +13,7 @@ describe "Category assignment" do
   it "is possible on a post" do
     new_category = client.create_category(name: "Post assignment 1")
     client.assign_category_to_post(post_id: existing_post.id, category_id: new_category.id)
-    expect(client.get_post(existing_post.id).categories).to include new_category
+    expect(client.find_post(existing_post.id).categories).to include new_category
   end
 
   it "can be removed on a post" do
@@ -21,7 +21,7 @@ describe "Category assignment" do
     client.assign_category_to_post(post_id: existing_post.id, category_id: new_category.id)
 
     client.remove_category_from_post(post_id: existing_post.id, category_id: new_category.id)
-    expect(client.get_post(existing_post.id).categories).to_not include(new_category)
+    expect(client.find_post(existing_post.id).categories).to_not include(new_category)
   end
 
   it "can be set for multiple categories when creating a post" do
@@ -37,7 +37,7 @@ describe "Category assignment" do
 
     client.update_post(post.id, category_ids: [category.id])
 
-    post = client.get_post(post.id)
+    post = client.find_post(post.id)
     expect(post.categories).to eq [category]
   end
 

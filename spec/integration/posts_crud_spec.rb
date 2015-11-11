@@ -20,11 +20,11 @@ describe "Posts (CRUD)" do
   it "can get specific posts" do
     existing_post = find_existing_post
 
-    found_post = client.get_post(existing_post.id)
+    found_post = client.find_post(existing_post.id)
     expect(found_post.id).to eq existing_post.id
     expect(found_post.title).to eq existing_post.title
 
-    expect { client.get_post(888888) }.to raise_error(Wpclient::NotFoundError)
+    expect { client.find_post(888888) }.to raise_error(Wpclient::NotFoundError)
   end
 
   it "can create a post" do
@@ -54,7 +54,7 @@ describe "Posts (CRUD)" do
 
     client.update_post(post.id, title: "Updated title")
 
-    expect(client.get_post(post.id).title).to eq "Updated title"
+    expect(client.find_post(post.id).title).to eq "Updated title"
   end
 
   it "raises errors if post could not be updated" do

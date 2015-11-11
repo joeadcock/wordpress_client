@@ -88,7 +88,7 @@ describe Wpclient::Client do
         body: post_fixture.to_json,
       )
 
-      post = client.get_post(id)
+      post = client.find_post(id)
       expect(post).to be_instance_of(Wpclient::Post)
       expect(post.id).to eq id
       expect(post.title).to eq Wpclient::Post.new(post_fixture).title
@@ -97,7 +97,7 @@ describe Wpclient::Client do
     it "raises a Wpclient::NotFoundError when post cannot be found" do
       stub_request(:get, "#{base_url}/wp/v2/posts/5?_embed").to_return(status: 404)
 
-      expect { client.get_post(5) }.to raise_error(Wpclient::NotFoundError)
+      expect { client.find_post(5) }.to raise_error(Wpclient::NotFoundError)
     end
   end
 

@@ -23,7 +23,7 @@ module Wpclient
       end
     end
 
-    def get_post(id)
+    def find_post(id)
       post = get_json("posts/#{id.to_i}", _embed: nil)
       Post.new(post)
     end
@@ -94,7 +94,7 @@ module Wpclient
         post
       else
         ReplaceCategories.call(self, post, category_ids)
-        get_post(post.id)
+        find_post(post.id)
       end
     end
 
