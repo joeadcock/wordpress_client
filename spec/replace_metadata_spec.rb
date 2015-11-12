@@ -15,6 +15,9 @@ module Wpclient
       client = instance_double(Client)
       post = instance_double(Post, id: 5, meta: {"change_me" => "1"})
 
+      expect(post).to receive(:meta_id_for).with("change_me").and_return(13)
+
+      expect(client).to receive(:remove_meta_from_post).with(post_id: 5, meta_id: 13)
       expect(client).to receive(:assign_meta_to_post).with(post_id: 5, key: "change_me", value: "2")
 
       ReplaceMetadata.call(client, post, change_me: "2")
