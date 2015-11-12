@@ -1,13 +1,7 @@
 require "spec_helper"
 
 describe "Category assignment" do
-  before { WebMock.allow_net_connect! }
-
-  let(:client) {
-    server = WordpressServer.instance
-    Wpclient.new(url: server.url, username: server.username, password: server.password)
-  }
-
+  setup_integration_client
   let(:existing_post) { find_existing_post }
 
   it "is possible on a post" do
