@@ -108,6 +108,12 @@ module Wpclient
       )
     end
 
+    def update_meta_on_post(post_id:, meta_id:, key:, value:)
+      handle_status_code(
+        post_json("posts/#{post_id}/meta/#{meta_id}", {key: key, value: value}, method: :patch)
+      )
+    end
+
     def inspect
       "#<Wpclient::Client #@username @ #@url>"
     end

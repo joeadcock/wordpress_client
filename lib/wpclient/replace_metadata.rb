@@ -51,8 +51,9 @@ module Wpclient
     end
 
     def replace(key, value)
-      remove(key)
-      add(key, value)
+      client.update_meta_on_post(
+        post_id: post.id, meta_id: post.meta_id_for(key), key: key, value: value
+      )
     end
 
     def keep(*)
