@@ -63,8 +63,17 @@ module Wpclient
       post_data = parse_json_response(
         post_json("posts/#{id.to_i}?_embed", attributes, method: :patch)
       )
+
       post = Post.new(post_data)
+
+      assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+
+      if attributes.has_key?(:meta) || attributes.has_key?(:category_ids)
+        find_post(post.id)
+      else
+        post
+      end
     end
 
     def update_category(id, attributes)
@@ -95,11 +104,7 @@ module Wpclient
 
     private
     def assign_categories(post, category_ids)
-      if category_ids.nil?
-        post
-      else
-        ReplaceCategories.call(self, post, category_ids)
-      end
+      ReplaceCategories.call(self, post, category_ids) unless category_ids.nil?
     end
 
     def assign_meta(post, meta)

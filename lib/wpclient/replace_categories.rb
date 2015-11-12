@@ -16,7 +16,6 @@ module Wpclient
     def replace
       categories_to_add.each { |id| add_category_id(id) }
       categories_to_remove.each { |id| remove_category_id(id) }
-      client.find_post(post.id)
     end
 
     private
