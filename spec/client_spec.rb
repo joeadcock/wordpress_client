@@ -19,7 +19,7 @@ describe Wpclient::Client do
   describe "finding posts" do
     it "has working pagination" do
       request_stub = stub_request(
-        :get, "http://myself:mysecret@example.com/wp-json/wp/v2/posts?per_page=13&page=2"
+        :get, "http://myself:mysecret@example.com/wp-json/wp/v2/posts?per_page=13&page=2&_embed"
       ).to_return(body: "[]", headers: {"content-type" => "application/json; charset=utf-8"})
 
       client = Wpclient.new(
@@ -83,21 +83,21 @@ describe Wpclient::Client do
       post_fixture = json_fixture("simple-post.json")
       id = post_fixture.fetch("id")
 
-      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}").to_return(
+      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}?_embed").to_return(
         headers: {"content-type" => "application/json; charset=utf-8"},
         body: post_fixture.to_json,
       )
 
-      post = client.get_post(id)
+      post = client.find_post(id)
       expect(post).to be_instance_of(Wpclient::Post)
       expect(post.id).to eq id
       expect(post.title).to eq Wpclient::Post.new(post_fixture).title
     end
 
     it "raises a Wpclient::NotFoundError when post cannot be found" do
-      stub_request(:get, "#{base_url}/wp/v2/posts/5").to_return(status: 404)
+      stub_request(:get, "#{base_url}/wp/v2/posts/5?_embed").to_return(status: 404)
 
-      expect { client.get_post(5) }.to raise_error(Wpclient::NotFoundError)
+      expect { client.find_post(5) }.to raise_error(Wpclient::NotFoundError)
     end
   end
 
@@ -118,7 +118,7 @@ describe Wpclient::Client do
         }
       )
 
-      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}").to_return(
+      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}?_embed").to_return(
         headers: {"content-type" => "application/json; charset=utf-8"},
         body: post_fixture.to_json,
       )
@@ -148,7 +148,7 @@ describe Wpclient::Client do
       post_fixture = json_fixture("simple-post.json")
       encoding = "".encoding
 
-      stub_request(:patch, "#{base_url}/wp/v2/posts/42").with(
+      stub_request(:patch, "#{base_url}/wp/v2/posts/42?_embed").with(
         headers: {"content-type" => "application/json; charset=#{encoding}"},
         body: {title: "New title"}.to_json,
       ).to_return(

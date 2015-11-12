@@ -6,6 +6,7 @@ module Wpclient
       :id, :title, :url, :guid,
       :excerpt_html, :content_html,
       :updated_at, :date,
+      :categories,
     )
 
     def initialize(data)
@@ -19,7 +20,11 @@ module Wpclient
 
       @updated_at = read_date(data, "modified")
       @date = read_date(data, "date")
+
+      @categories = read_categories(data)
     end
+
+    def category_ids() categories.map(&:id) end
 
     private
     def rendered(data, name)
@@ -33,6 +38,22 @@ module Wpclient
       elsif (local_time = data[name])
         Time.iso8601(local_time)
       end
+    end
+
+    def read_categories(data)
+      embedded_terms(data, "category").map do |category|
+        Category.parse(category)
+      end
+    end
+
+    def embedded_terms(data, type)
+      term_collections = data.fetch("_embedded", {})["http://v2.wp-api.org/term"] || []
+
+      # term_collections is an array of arrays with terms in them. We can see
+      # the type of the "collection" by inspecting the first child's taxonomy.
+      term_collections.detect { |terms|
+        terms.size > 0 && terms.first["taxonomy"] == type
+      } || []
     end
   end
 end

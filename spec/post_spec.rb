@@ -6,17 +6,36 @@ describe Wpclient::Post do
   it "can be parsed from JSON data" do
     post = Wpclient::Post.new(fixture)
 
-    expect(post.id).to eq 7
-    expect(post.title).to eq "Hello Friend"
+    expect(post.id).to eq 1
+    expect(post.title).to eq "Hello world!"
 
-    expect(post.url).to eq "https://example.com/2015/11/hello-friend/"
-    expect(post.guid).to eq "http://example.com/?p=7"
+    expect(post.url).to eq "http://example.com/2015/11/03/hello-world/"
+    expect(post.guid).to eq "http://example.com/?p=1"
 
-    expect(post.excerpt_html).to eq "<p>Hello Friend</p>\n"
-    expect(post.content_html).to eq "<p>Hello Friend</p>\n"
+    expect(post.excerpt_html).to eq(
+      "<p>Welcome to WordPress. This is your first post. Edit or delete it, then start " \
+      "writing!</p>\n"
+    )
+
+    expect(post.content_html).to eq(
+      "<p>Welcome to WordPress. This is your first post. Edit or delete it, then start " \
+      "writing!</p>\n"
+    )
 
     expect(post.date).to_not be nil
     expect(post.updated_at).to_not be nil
+  end
+
+  it "parses categories" do
+    post = Wpclient::Post.new(fixture)
+
+    expect(post.categories).to eq [
+      Wpclient::Category.new(
+        id: 1, name: "Uncategorized", slug: "uncategorized"
+      )
+    ]
+
+    expect(post.category_ids).to eq [1]
   end
 
   describe "dates" do
