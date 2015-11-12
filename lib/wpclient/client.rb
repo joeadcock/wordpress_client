@@ -94,7 +94,6 @@ module Wpclient
         post
       else
         ReplaceCategories.call(self, post, category_ids)
-        find_post(post.id)
       end
     end
 

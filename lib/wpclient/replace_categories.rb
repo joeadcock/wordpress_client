@@ -14,13 +14,9 @@ module Wpclient
     end
 
     def replace
-      categories_to_add.each do |id|
-        client.assign_category_to_post(post_id: post.id, category_id: id)
-      end
-
-      categories_to_remove.each do |id|
-        client.remove_category_from_post(post_id: post.id, category_id: id)
-      end
+      categories_to_add.each { |id| add_category_id(id) }
+      categories_to_remove.each { |id| remove_category_id(id) }
+      client.find_post(post.id)
     end
 
     private
@@ -32,6 +28,14 @@ module Wpclient
 
     def categories_to_remove
       existing_ids - wanted_ids
+    end
+
+    def add_category_id(id)
+      client.assign_category_to_post(post_id: post.id, category_id: id)
+    end
+
+    def remove_category_id(id)
+      client.remove_category_from_post(post_id: post.id, category_id: id)
     end
   end
 end
