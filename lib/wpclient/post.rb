@@ -6,7 +6,7 @@ module Wpclient
       :id, :title, :url, :guid,
       :excerpt_html, :content_html,
       :updated_at, :date,
-      :categories,
+      :categories, :meta
     )
 
     def initialize(data)
@@ -22,6 +22,7 @@ module Wpclient
       @date = read_date(data, "date")
 
       @categories = read_categories(data)
+      @meta = read_metadata(data["_embedded"])
     end
 
     def category_ids() categories.map(&:id) end
@@ -46,6 +47,15 @@ module Wpclient
       end
     end
 
+    def read_metadata(embeds)
+      embedded_metadata = embeds.fetch("http://v2.wp-api.org/meta", []).flatten
+      validate_embedded_metadata(embedded_metadata)
+
+      embedded_metadata.flatten.each_with_object({}) do |entry, metadata|
+        metadata[entry.fetch("key")] = entry.fetch("value")
+      end
+    end
+
     def embedded_terms(data, type)
       term_collections = data.fetch("_embedded", {})["http://v2.wp-api.org/term"] || []
 
@@ -54,6 +64,21 @@ module Wpclient
       term_collections.detect { |terms|
         terms.size > 0 && terms.first["taxonomy"] == type
       } || []
+    end
+
+    def validate_embedded_metadata(embedded_metadata)
+      if embedded_metadata.size == 1 && embedded_metadata.first["code"]
+        error = embedded_metadata.first
+        case error["code"]
+        when "rest_forbidden"
+          raise UnauthorizedError, error.fetch(
+            "message", "You are not authorized to see meta for this post."
+          )
+        else
+          raise Error, "Could not retreive meta for this post: " \
+            "#{error["code"]} – #{error["message"]}"
+        end
+      end
     end
   end
 end

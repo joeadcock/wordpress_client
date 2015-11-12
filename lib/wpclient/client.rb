@@ -44,9 +44,14 @@ module Wpclient
 
     def create_post(attributes)
       response = assert_created(post_json("posts", attributes))
+
       data = get_json(response.headers.fetch("location"), _embed: nil)
       post = Post.new(data)
+
+      assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+
+      find_post(post.id)
     end
 
     def create_category(attributes)
@@ -94,6 +99,14 @@ module Wpclient
         post
       else
         ReplaceCategories.call(self, post, category_ids)
+      end
+    end
+
+    def assign_meta(post, meta)
+      if meta
+        meta.each_pair do |key, value|
+          assert_created(post_json("posts/#{post.id}/meta", key: key, value: value))
+        end
       end
     end
 
