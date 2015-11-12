@@ -75,5 +75,17 @@ describe Wpclient::Post do
         Wpclient::Post.new(json_fixture("post-with-forbidden-metadata.json"))
       }.to raise_error(Wpclient::UnauthorizedError)
     end
+
+    it "keeps track of the ID of each metadata key" do
+      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      expect(post.meta_id_for("foo")).to eq 2
+    end
+
+    it "raises ArgumentError when asked for the meta ID of a meta key not present" do
+      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      expect {
+        post.meta_id_for("clearly unreal")
+      }.to raise_error(ArgumentError, /clearly unreal/)
+    end
   end
 end

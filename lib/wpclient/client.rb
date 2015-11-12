@@ -98,21 +98,27 @@ module Wpclient
       true # Don't leak the response
     end
 
+    def assign_meta_to_post(post_id:, key:, value:)
+      assert_created(post_json("posts/#{post_id}/meta", key: key, value: value))
+    end
+
+    def remove_meta_from_post(post_id:, meta_id:)
+      handle_status_code(
+        post_json("posts/#{post_id}/meta/#{meta_id}", {force: true}, method: :delete)
+      )
+    end
+
     def inspect
       "#<Wpclient::Client #@username @ #@url>"
     end
 
     private
     def assign_categories(post, category_ids)
-      ReplaceCategories.call(self, post, category_ids) unless category_ids.nil?
+      ReplaceCategories.call(self, post, category_ids) if category_ids
     end
 
     def assign_meta(post, meta)
-      if meta
-        meta.each_pair do |key, value|
-          assert_created(post_json("posts/#{post.id}/meta", key: key, value: value))
-        end
-      end
+      ReplaceMetadata.call(self, post, meta) if meta
     end
 
     def connection

@@ -13,4 +13,10 @@ describe "Post meta" do
     post = client.update_post(post.id, meta: {"before" => "then", "after" => "now"})
     expect(post.meta).to eq("before" => "then", "after" => "now")
   end
+
+  it "can remove metadata for a post" do
+    post = client.create_post(title: "Metadata creation", meta: {one: "1", two: "2", three: "3"})
+    post = client.update_post(post.id, meta: {three: "3"})
+    expect(post.meta).to eq("three" => "3")
+  end
 end

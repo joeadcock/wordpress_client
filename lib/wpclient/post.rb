@@ -22,10 +22,17 @@ module Wpclient
       @date = read_date(data, "date")
 
       @categories = read_categories(data)
-      @meta = read_metadata(data["_embedded"])
+
+      @meta = {}
+      @meta_ids = {}
+      read_and_assign_metadata(data["_embedded"])
     end
 
     def category_ids() categories.map(&:id) end
+
+    def meta_id_for(key)
+      @meta_ids[key] || raise(ArgumentError, "Post does not have meta #{key.inspect}")
+    end
 
     private
     def rendered(data, name)
@@ -47,12 +54,13 @@ module Wpclient
       end
     end
 
-    def read_metadata(embeds)
+    def read_and_assign_metadata(embeds)
       embedded_metadata = embeds.fetch("http://v2.wp-api.org/meta", []).flatten
       validate_embedded_metadata(embedded_metadata)
 
-      embedded_metadata.flatten.each_with_object({}) do |entry, metadata|
-        metadata[entry.fetch("key")] = entry.fetch("value")
+      embedded_metadata.flatten.each do |entry|
+        @meta[entry.fetch("key")] = entry.fetch("value")
+        @meta_ids[entry.fetch("key")] = entry.fetch("id")
       end
     end
 
