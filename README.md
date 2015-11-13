@@ -38,6 +38,8 @@ Run tests using the normal `rspec` command after installing all bundles. The fir
 bundle exec rspec
 ```
 
+You can also run `bundle exec guard` to have tests run automatically when you change files in the repo.
+
 ## Copyright & License
 
 Copyright © 2015 Hemnet Service HNS AB
