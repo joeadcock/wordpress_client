@@ -11,6 +11,6 @@ require "wpclient/replace_metadata"
 
 module Wpclient
   def self.new(*args)
-    Client.new(*args)
+    Client.new(Connection.new(*args))
   end
 end

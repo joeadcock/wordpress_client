@@ -3,13 +3,8 @@ require "json"
 
 module Wpclient
   class Client
-    attr_reader :url, :username
-
-    def initialize(url:, username:, password:)
-      @connection = Connection.new(url: url, username: username, password: password)
-      @url = url
-      @username = username
-      @password = password
+    def initialize(connection)
+      @connection = connection
     end
 
     def posts(per_page: 10, page: 1)
