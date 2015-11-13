@@ -2,6 +2,15 @@ require "spec_helper"
 
 module Wpclient
   describe ReplaceMetadata do
+    it "does nothing if the new metadata is equal to the existing one" do
+      post = instance_double(Post, id: 5, meta: {"existing" => "1"})
+
+      # Note: client double does not accept any message.
+      client = instance_double(Client)
+
+      ReplaceMetadata.call(client, post, existing: "1")
+    end
+
     it "adds missing metadata" do
       client = instance_double(Client)
       post = instance_double(Post, id: 5, meta: {"existing" => "1"})
