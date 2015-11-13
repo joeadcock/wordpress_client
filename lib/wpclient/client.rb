@@ -44,9 +44,14 @@ module Wpclient
 
     def create_post(attributes)
       response = assert_created(post_json("posts", attributes))
+
       data = get_json(response.headers.fetch("location"), _embed: nil)
       post = Post.new(data)
+
+      assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+
+      find_post(post.id)
     end
 
     def create_category(attributes)
@@ -58,8 +63,17 @@ module Wpclient
       post_data = parse_json_response(
         post_json("posts/#{id.to_i}?_embed", attributes, method: :patch)
       )
+
       post = Post.new(post_data)
+
+      assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+
+      if attributes.has_key?(:meta) || attributes.has_key?(:category_ids)
+        find_post(post.id)
+      else
+        post
+      end
     end
 
     def update_category(id, attributes)
@@ -84,17 +98,33 @@ module Wpclient
       true # Don't leak the response
     end
 
+    def assign_meta_to_post(post_id:, key:, value:)
+      assert_created(post_json("posts/#{post_id}/meta", key: key, value: value))
+    end
+
+    def remove_meta_from_post(post_id:, meta_id:)
+      handle_status_code(
+        post_json("posts/#{post_id}/meta/#{meta_id}", {force: true}, method: :delete)
+      )
+    end
+
+    def update_meta_on_post(post_id:, meta_id:, key:, value:)
+      handle_status_code(
+        post_json("posts/#{post_id}/meta/#{meta_id}", {key: key, value: value}, method: :patch)
+      )
+    end
+
     def inspect
       "#<Wpclient::Client #@username @ #@url>"
     end
 
     private
     def assign_categories(post, category_ids)
-      if category_ids.nil?
-        post
-      else
-        ReplaceCategories.call(self, post, category_ids)
-      end
+      ReplaceCategories.call(self, post, category_ids) if category_ids
+    end
+
+    def assign_meta(post, meta)
+      ReplaceMetadata.call(self, post, meta) if meta
     end
 
     def connection

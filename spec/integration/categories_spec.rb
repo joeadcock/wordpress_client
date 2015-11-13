@@ -1,12 +1,7 @@
 require "spec_helper"
 
 describe "Categories" do
-  before { WebMock.allow_net_connect! }
-
-  let(:client) {
-    server = WordpressServer.instance
-    Wpclient.new(url: server.url, username: server.username, password: server.password)
-  }
+  setup_integration_client
 
   it "is listed on found posts" do
     post = client.posts(per_page: 1).first

@@ -1,12 +1,7 @@
 require "spec_helper"
 
 describe "Posts (finding)" do
-  before { WebMock.allow_net_connect! }
-
-  let(:client) {
-    server = WordpressServer.instance
-    Wpclient.new(url: server.url, username: server.username, password: server.password)
-  }
+  setup_integration_client
 
   describe "finding by slug" do
     it "finds the matching post" do

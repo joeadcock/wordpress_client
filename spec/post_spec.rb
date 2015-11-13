@@ -63,4 +63,29 @@ describe Wpclient::Post do
       expect(post.updated_at).to eq Time.local(2001, 1, 1, 12, 0, 0)
     end
   end
+
+  describe "metadata" do
+    it "is parsed into a hash" do
+      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      expect(post.meta).to eq "foo" => "bar"
+    end
+
+    it "raises UnauthorizedError when post it is forbidden" do
+      expect {
+        Wpclient::Post.new(json_fixture("post-with-forbidden-metadata.json"))
+      }.to raise_error(Wpclient::UnauthorizedError)
+    end
+
+    it "keeps track of the ID of each metadata key" do
+      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      expect(post.meta_id_for("foo")).to eq 2
+    end
+
+    it "raises ArgumentError when asked for the meta ID of a meta key not present" do
+      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      expect {
+        post.meta_id_for("clearly unreal")
+      }.to raise_error(ArgumentError, /clearly unreal/)
+    end
+  end
 end

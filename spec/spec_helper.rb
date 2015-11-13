@@ -4,8 +4,10 @@ require "wpclient"
 
 require_relative "support/wordpress_server"
 require_relative "support/fixtures"
+require_relative "support/integration_macros"
 
 RSpec.configure do |config|
+  config.extend IntegrationMacros
   config.include Fixtures
 
   config.before do
