@@ -9,6 +9,9 @@ module Wpclient
       :categories, :meta
     )
 
+    # TODO: Expand and replace the normal "new" method
+    def self.parse(*args) new(*args) end
+
     def initialize(data)
       @id = data["id"]
       @url = data["link"]

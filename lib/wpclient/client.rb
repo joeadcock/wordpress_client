@@ -6,47 +6,39 @@ module Wpclient
     attr_reader :url, :username
 
     def initialize(url:, username:, password:)
+      @connection = Connection.new(url: url, username: username, password: password)
       @url = url
       @username = username
       @password = password
     end
 
     def posts(per_page: 10, page: 1)
-      get_json("posts", page: page, per_page: per_page, _embed: nil).map do |post|
-        Post.new(post)
-      end
-    end
-
-    def categories(per_page: 10, page: 1)
-      get_json("terms/category", page: page, per_page: per_page).map do |category|
-        Category.parse(category)
-      end
+      connection.get_multiple(Post, "posts", per_page: per_page, page: page, _embed: nil)
     end
 
     def find_post(id)
-      post = get_json("posts/#{id.to_i}", _embed: nil)
-      Post.new(post)
+      connection.get(Post, "posts/#{id.to_i}", _embed: nil)
     end
 
     def find_by_slug(slug)
-      posts = get_json("posts", filter: {name: slug}, _embed: nil)
+      posts = connection.get_multiple(Post, "posts", per_page: 1, filter: {name: slug}, _embed: nil)
       if posts.size > 0
-        Post.new(posts.first)
+        posts.first
       else
         raise NotFoundError, "Could not find post with slug #{slug.to_s.inspect}"
       end
     end
 
+    def categories(per_page: 10, page: 1)
+      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
+    end
+
     def find_category(id)
-      category = get_json("terms/category/#{id.to_i}")
-      Category.parse(category)
+      connection.get(Category, "terms/category/#{id.to_i}")
     end
 
     def create_post(attributes)
-      response = assert_created(post_json("posts", attributes))
-
-      data = get_json(response.headers.fetch("location"), _embed: nil)
-      post = Post.new(data)
+      post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
       assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
@@ -55,16 +47,11 @@ module Wpclient
     end
 
     def create_category(attributes)
-      category = parse_json_response(post_json("terms/category", attributes))
-      Category.parse(category)
+      connection.create(Category, "terms/category", attributes)
     end
 
     def update_post(id, attributes)
-      post_data = parse_json_response(
-        post_json("posts/#{id.to_i}?_embed", attributes, method: :patch)
-      )
-
-      post = Post.new(post_data)
+      post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
 
       assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
@@ -77,136 +64,42 @@ module Wpclient
     end
 
     def update_category(id, attributes)
-      category = parse_json_response(
-        post_json("terms/category/#{id.to_i}", attributes, method: :patch)
-      )
-      Category.parse(category)
+      connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
     def assign_category_to_post(post_id:, category_id:)
-      assert_created(post_json("posts/#{post_id}/terms/category/#{category_id}", {}))
-      true # Don't leak the response
+      connection.create_without_response("posts/#{post_id}/terms/category/#{category_id}", {})
     end
 
     def remove_category_from_post(post_id:, category_id:)
-      response = post_json(
-        "posts/#{post_id}/terms/category/#{category_id}",
-        {force: true},
-        method: :delete
-      )
-      handle_status_code(response)
-      true # Don't leak the response
+      connection.delete("posts/#{post_id}/terms/category/#{category_id}", force: true)
     end
 
     def assign_meta_to_post(post_id:, key:, value:)
-      assert_created(post_json("posts/#{post_id}/meta", key: key, value: value))
+      connection.create_without_response("posts/#{post_id}/meta", key: key, value: value)
     end
 
     def remove_meta_from_post(post_id:, meta_id:)
-      handle_status_code(
-        post_json("posts/#{post_id}/meta/#{meta_id}", {force: true}, method: :delete)
-      )
+      connection.delete("posts/#{post_id}/meta/#{meta_id}", force: true)
     end
 
     def update_meta_on_post(post_id:, meta_id:, key:, value:)
-      handle_status_code(
-        post_json("posts/#{post_id}/meta/#{meta_id}", {key: key, value: value}, method: :patch)
-      )
+      connection.patch_without_response("posts/#{post_id}/meta/#{meta_id}", key: key, value: value)
     end
 
     def inspect
-      "#<Wpclient::Client #@username @ #@url>"
+      "#<Wpclient::Client #{connection.inspect}>"
     end
 
     private
+    attr_reader :connection
+
     def assign_categories(post, category_ids)
       ReplaceCategories.call(self, post, category_ids) if category_ids
     end
 
     def assign_meta(post, meta)
       ReplaceMetadata.call(self, post, meta) if meta
-    end
-
-    def connection
-      @connection ||= create_connection
-    end
-
-    def create_connection
-      Faraday.new(url: "#{url}/wp/v2") do |conn|
-        conn.request :basic_auth, username, @password
-        conn.adapter :net_http
-      end
-    end
-
-    def post_json(path, data, method: :post)
-      json = data.to_json
-      connection.public_send(method) do |request|
-        request.url path
-        request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
-        request.body = json
-      end
-    rescue Faraday::TimeoutError
-      raise TimeoutError
-    end
-
-    def get_json(path, params = {})
-      parse_json_response(connection.get(path, params))
-    rescue Faraday::TimeoutError
-      raise TimeoutError
-    end
-
-    def parse_json_response(response)
-      handle_status_code(response)
-
-      content_type = response.headers["content-type"].split(";").first
-      unless content_type == "application/json"
-        raise ServerError, "Got content type #{content_type}"
-      end
-
-      JSON.parse(response.body)
-
-    rescue JSON::ParserError => error
-      raise ServerError, "Could not parse JSON response: #{error}"
-    end
-
-    def handle_status_code(response)
-      case response.status
-      when 200
-        return
-      when 404
-        raise NotFoundError, "Could not find resource"
-      when 400
-        handle_bad_request(response)
-      else
-        raise ServerError, "Server returned status code #{response.status}: #{response.body}"
-      end
-    end
-
-    def assert_created(response)
-      if response.status == 201 # Created
-        response
-      else
-        handle_status_code(response)
-        # If we get here, the status code was successful, but not the expected
-        # 201 Created (excluded above). This should not happen.
-        raise ServerError, "Got unexpected response from server: #{response.status}"
-      end
-    end
-
-    def handle_bad_request(response)
-      code, message = bad_request_details(response)
-      if code == "rest_post_invalid_id"
-        raise NotFoundError, "Post ID is not found"
-      else
-        raise ValidationError, message
-      end
-    end
-
-    def bad_request_details(response)
-      details = JSON.parse(response.body).first
-      [details["code"], details["message"]]
-    rescue
-      [nil, "Bad Request"]
     end
   end
 end

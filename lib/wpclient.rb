@@ -1,6 +1,7 @@
 require "wpclient/version"
 require "wpclient/errors"
 
+require "wpclient/connection"
 require "wpclient/client"
 require "wpclient/category"
 require "wpclient/post"
