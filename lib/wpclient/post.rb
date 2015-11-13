@@ -2,7 +2,7 @@ require "time"
 
 module Wpclient
   class Post
-    attr_reader(
+    attr_accessor(
       :id, :title, :url, :guid,
       :excerpt_html, :content_html,
       :updated_at, :date,
@@ -14,14 +14,14 @@ module Wpclient
     end
 
     def initialize(
-      id:,
-      url:,
-      title:,
-      guid:,
-      excerpt_html:,
-      content_html:,
-      updated_at:,
-      date:,
+      id: nil,
+      url: nil,
+      title: nil,
+      guid: nil,
+      excerpt_html: nil,
+      content_html: nil,
+      updated_at: nil,
+      date: nil,
       categories: [],
       meta: {},
       meta_ids: {}
