@@ -82,7 +82,7 @@ describe Wpclient::Client do
       post = client.find_post(id)
       expect(post).to be_instance_of(Wpclient::Post)
       expect(post.id).to eq id
-      expect(post.title).to eq Wpclient::Post.new(post_fixture).title
+      expect(post.title).to eq Wpclient::Post.parse(post_fixture).title
     end
 
     it "raises a Wpclient::NotFoundError when post cannot be found" do
@@ -149,7 +149,7 @@ describe Wpclient::Client do
 
       post = client.update_post(42, title: "New title")
       expect(post).to be_instance_of(Wpclient::Post)
-      expect(post.title).to eq Wpclient::Post.new(post_fixture).title
+      expect(post.title).to eq Wpclient::Post.parse(post_fixture).title
     end
 
     it "raises ValidationError when server rejects changes" do

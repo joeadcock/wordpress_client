@@ -6,6 +6,8 @@ require "wpclient/client"
 require "wpclient/category"
 require "wpclient/post"
 
+require "wpclient/post_parser"
+
 require "wpclient/replace_categories"
 require "wpclient/replace_metadata"
 
