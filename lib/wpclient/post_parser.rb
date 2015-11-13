@@ -9,40 +9,63 @@ module Wpclient
     end
 
     def to_post
-      @id = data["id"]
-      @url = data["link"]
-
-      @title = rendered("title")
-      @guid = rendered("guid")
-      @excerpt_html = rendered("excerpt")
-      @content_html = rendered("content")
-
-      @updated_at = read_date("modified")
-      @date = read_date("date")
-
-      @categories = read_categories(data)
-
-      @meta = {}
-      @meta_ids = {}
-      read_and_assign_metadata(data["_embedded"])
+      meta, meta_ids = parse_metadata
 
       Post.new(
-        id: @id,
-        url: @url,
-        title: @title,
-        guid: @guid,
-        excerpt_html: @excerpt_html,
-        content_html: @content_html,
-        updated_at: @updated_at,
-        date: @date,
-        categories: @categories,
-        meta: @meta,
-        meta_ids: @meta_ids
+        id: id,
+        url: url,
+        title: title,
+        guid: guid,
+        excerpt_html: excerpt_html,
+        content_html: content_html,
+        updated_at: updated_at,
+        date: date,
+        categories: parse_categories,
+        meta: meta,
+        meta_ids: meta_ids
       )
     end
 
     private
     attr_reader :data
+
+    def id
+      data["id"]
+    end
+
+    def url
+      data["link"]
+    end
+
+    def title
+      rendered("title")
+    end
+
+    def guid
+      rendered("guid")
+    end
+
+    def excerpt_html
+      rendered("excerpt")
+    end
+
+    def content_html
+      rendered("content")
+    end
+
+    def updated_at
+      read_date("modified")
+    end
+
+    def date
+      read_date("date")
+    end
+
+    def parse_categories
+      embedded_terms("category").map do |category|
+        Category.parse(category)
+      end
+    end
 
     def rendered(name)
       (data[name] || {})["rendered"]
@@ -57,23 +80,22 @@ module Wpclient
       end
     end
 
-    def read_categories(data)
-      embedded_terms(data, "category").map do |category|
-        Category.parse(category)
-      end
-    end
-
-    def read_and_assign_metadata(embeds)
-      embedded_metadata = embeds.fetch("http://v2.wp-api.org/meta", []).flatten
+    def parse_metadata
+      embedded_metadata = datap["_embedded"].fetch("http://v2.wp-api.org/meta", []).flatten
       validate_embedded_metadata(embedded_metadata)
 
+      meta = {}
+      meta_ids = {}
+
       embedded_metadata.flatten.each do |entry|
-        @meta[entry.fetch("key")] = entry.fetch("value")
-        @meta_ids[entry.fetch("key")] = entry.fetch("id")
+        meta[entry.fetch("key")] = entry.fetch("value")
+        meta_ids[entry.fetch("key")] = entry.fetch("id")
       end
+
+      [meta, meta_ids]
     end
 
-    def embedded_terms(data, type)
+    def embedded_terms(type)
       term_collections = data.fetch("_embedded", {})["http://v2.wp-api.org/term"] || []
 
       # term_collections is an array of arrays with terms in them. We can see
