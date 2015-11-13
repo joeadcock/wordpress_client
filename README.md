@@ -2,7 +2,7 @@
 
 wpclient is a simple client to the Wordpress API.
 
-[![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient) [![Code Climate](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/gpa.svg)](https://codeclimate.com/repos/5645938269568041da00cded/feed)
+[![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient) [![Code Climate](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/gpa.svg)](https://codeclimate.com/repos/5645938269568041da00cded/feed) [![Test Coverage](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/coverage.svg)](https://codeclimate.com/repos/5645938269568041da00cded/coverage)
 
 ## Usage
 
