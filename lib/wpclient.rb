@@ -5,6 +5,7 @@ require "wpclient/connection"
 require "wpclient/client"
 require "wpclient/category"
 require "wpclient/post"
+require "wpclient/paginated_collection"
 
 require "wpclient/post_parser"
 
