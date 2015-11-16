@@ -13,7 +13,9 @@ module Wpclient
     end
 
     def get_multiple(model, path, params = {})
-      get_json(path, params).map { |data| model.parse(data) }
+      data, response = get_json_and_response(path, params)
+      models = data.map { |model_data| model.parse(model_data) }
+      wrap_paginated_collection(response, models, params)
     end
 
     def create(model, path, attributes, redirect_params: {})
@@ -71,8 +73,23 @@ module Wpclient
       end
     end
 
+    def wrap_paginated_collection(response, entries, params)
+      total = response.headers.fetch("x-wp-total").to_i
+      current_page = params.fetch(:page).to_i
+      per_page = params.fetch(:per_page).to_i
+
+      PaginatedCollection.new(
+        entries, total: total, current_page: current_page, per_page: per_page
+      )
+    end
+
     def get_json(path, params = {})
-      parse_json_response(net.get(path, params))
+      get_json_and_response(path, params).first
+    end
+
+    def get_json_and_response(path, params = {})
+      response = net.get(path, params)
+      [parse_json_response(response), response]
     rescue Faraday::TimeoutError
       raise TimeoutError
     end

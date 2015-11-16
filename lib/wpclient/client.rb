@@ -16,7 +16,9 @@ module Wpclient
     end
 
     def find_by_slug(slug)
-      posts = connection.get_multiple(Post, "posts", per_page: 1, filter: {name: slug}, _embed: nil)
+      posts = connection.get_multiple(
+        Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
+      )
       if posts.size > 0
         posts.first
       else

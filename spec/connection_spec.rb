@@ -29,9 +29,23 @@ module Wpclient
       end
 
       it "can get several models" do
-        stub_get("#{base_url}/foos?some_param=12", returns: ["result"])
+        stub_get("#{base_url}/foos?some_param=12&page=1&per_page=1", returns: ["result"], total: 1)
+
         expect(model).to receive(:parse).with("result").and_return(model_instance)
-        expect(connection.get_multiple(model, "foos", some_param: 12)).to eq [model_instance]
+
+        expect(
+          connection.get_multiple(model, "foos", some_param: 12, page: 1, per_page: 1).to_a
+        ).to eq [model_instance]
+      end
+
+      it "paginates the result when fetching multiple models" do
+        stub_get("#{base_url}/foos?page=4&per_page=15", returns: ["result"], total: 62)
+        collection = connection.get_multiple(model, "foos", page: 4, per_page: 15)
+
+        expect(collection).to be_instance_of(PaginatedCollection)
+        expect(collection.total).to eq 62
+        expect(collection.current_page).to eq 4
+        expect(collection.per_page).to eq 15
       end
 
       it "raises Wpclient::TimeoutError when requests time out" do
@@ -184,13 +198,13 @@ module Wpclient
       returns: {},
       status: 200,
       body: returns.to_json,
+      total: nil,
       content_type: "application/json"
     )
-      stub_request(:get, path).to_return(
-        status: status,
-        body: body,
-        headers: {"content-type" => "#{content_type}; charset=utf-8"},
-      )
+      headers = {"content-type" => "#{content_type}; charset=utf-8"}
+      headers["X-WP-Total"] = total.to_s if total
+
+      stub_request(:get, path).to_return(status: status, body: body, headers: headers)
     end
 
     def stub_successful_post_with_redirect(path, data, redirects_to:)
