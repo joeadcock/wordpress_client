@@ -10,7 +10,7 @@ module Wpclient
       @per_page = per_page
     end
 
-    alias total_entires total
+    alias total_entries total
 
     def each
       if block_given?
