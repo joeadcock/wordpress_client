@@ -68,6 +68,18 @@ module Wpclient
       @entries
     end
 
+    def [](*args)
+      @entries[*args]
+    end
+
+    def first
+      @entries.first
+    end
+
+    def last
+      @entries.last
+    end
+
     # Allow PaginatedCollection to be coerced into an array
     alias to_ary to_a
   end
