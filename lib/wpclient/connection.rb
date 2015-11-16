@@ -12,7 +12,7 @@ module Wpclient
       model.parse(get_json(path, params))
     end
 
-    def get_multiple(model, path, params)
+    def get_multiple(model, path, params = {})
       get_json(path, params).map { |data| model.parse(data) }
     end
 
