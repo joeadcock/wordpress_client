@@ -62,14 +62,6 @@ module Wpclient
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
-    def assign_category_to_post(post_id:, category_id:)
-      connection.create_without_response("posts/#{post_id}/terms/category/#{category_id}", {})
-    end
-
-    def remove_category_from_post(post_id:, category_id:)
-      connection.delete("posts/#{post_id}/terms/category/#{category_id}", force: true)
-    end
-
     def assign_meta_to_post(post_id:, key:, value:)
       connection.create_without_response("posts/#{post_id}/meta", key: key, value: value)
     end
@@ -90,7 +82,7 @@ module Wpclient
     attr_reader :connection
 
     def assign_categories(post, category_ids)
-      ReplaceCategories.call(self, post, category_ids) if category_ids
+      ReplaceCategories.call(connection, post, category_ids) if category_ids
     end
 
     def assign_meta(post, meta)
