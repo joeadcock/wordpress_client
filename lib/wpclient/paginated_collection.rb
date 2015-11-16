@@ -10,6 +10,8 @@ module Wpclient
       @per_page = per_page
     end
 
+    alias total_entires total
+
     def each
       if block_given?
         @entries.each { |e| yield e }
