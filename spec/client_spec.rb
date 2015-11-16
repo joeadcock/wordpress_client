@@ -1,183 +1,84 @@
 require "spec_helper"
 
-describe Wpclient::Client do
-  let(:connection) {
-    Wpclient::Connection.new(url: "http://example.com", username: "x", password: "x")
-  }
-  let(:client) { Wpclient::Client.new(connection) }
-  let(:base_url) { "http://x:x@example.com" }
+describe Wpclient::Client  do
+  subject(:client) { Wpclient::Client.new(connection) }
+  let(:connection) { instance_double(Wpclient::Connection) }
 
   describe "finding posts" do
     it "has working pagination" do
-      request_stub = stub_request(
-        :get, "http://myself:mysecret@example.com/wp-json/wp/v2/posts?per_page=13&page=2&_embed"
-      ).to_return(body: "[]", headers: {"content-type" => "application/json; charset=utf-8"})
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(page: 2, per_page: 13)
+      ).and_return []
 
-      client = Wpclient.new(
-        url: "http://example.com/wp-json", username: "myself", password: "mysecret"
-      )
-
-      posts = client.posts(per_page: 13, page: 2)
-
-      expect(request_stub).to have_been_made
-      expect(posts).to eq []
+      expect(client.posts(per_page: 13, page: 2)).to eq []
     end
 
-    it "maps posts into Post instances" do
-      post_fixture = json_fixture("simple-post.json")
+    it "embeds linked resources" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(_embed: nil)
+      ).and_return []
 
-      stub_request(:get, /./).to_return(
-        headers: {"content-type" => "application/json"},
-        body: [post_fixture].to_json,
-      )
-
-      client = Wpclient.new(url: "http://example.com/", username: "x", password: "x")
-      post = client.posts.first
-
-      expect(post).to be_instance_of(Wpclient::Post)
-      expect(post.id).to eq post_fixture.fetch("id")
+      expect(client.posts).to eq []
     end
 
-    it "raises an Wpclient::TimeoutError when request times out" do
-      stub_request(:get, /./).to_timeout
-      expect { client.posts }.to raise_error(Wpclient::TimeoutError)
-    end
-
-    it "raises an Wpclient::ServerError when request body is broken" do
-      stub_request(:get, /./).to_return(
-        headers: {"content-type" => "application/json"},
-        body: "[",
-      )
-      expect { client.posts }.to raise_error(Wpclient::ServerError, /parse/i)
-    end
-
-    it "raises an Wpclient::ServerError when response body isn't JSON" do
-      stub_request(:get, /./).to_return(
-        headers: {"content-type" => "text/html"},
-        body: "[]",
-      )
-      expect { client.posts }.to raise_error(Wpclient::ServerError, /html/i)
-    end
-
-    it "raises an Wpclient::ServerError when response isn't OK" do
-      stub_request(:get, /./).to_return(
-        status: 401,
-        headers: {"content-type" => "application/json"},
-        body: "[]",
-      )
-      expect { client.posts }.to raise_error(Wpclient::ServerError, /401/i)
-    end
+    it "can find using a slug"
+    it "raises NotFoundError when trying to find by slug yields no posts"
   end
 
   describe "fetching a single post" do
-    it "GETS the post ID" do
-      post_fixture = json_fixture("simple-post.json")
-      id = post_fixture.fetch("id")
+    it "embeds linked resources" do
+      post = instance_double(Wpclient::Post)
 
-      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}?_embed").to_return(
-        headers: {"content-type" => "application/json; charset=utf-8"},
-        body: post_fixture.to_json,
-      )
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", _embed: nil
+      ).and_return post
 
-      post = client.find_post(id)
-      expect(post).to be_instance_of(Wpclient::Post)
-      expect(post.id).to eq id
-      expect(post.title).to eq Wpclient::Post.parse(post_fixture).title
-    end
-
-    it "raises a Wpclient::NotFoundError when post cannot be found" do
-      stub_request(:get, "#{base_url}/wp/v2/posts/5?_embed").to_return(status: 404)
-
-      expect { client.find_post(5) }.to raise_error(Wpclient::NotFoundError)
+      expect(client.find_post(5)).to eq post
     end
   end
 
   describe "creating a post" do
-    it "POSTS the data to the server" do
-      post_fixture = json_fixture("simple-post.json")
-      id = post_fixture.fetch("id")
-      encoding = "".encoding
+    it "embeds linked resources when following redirect" do
+      post = instance_double(Wpclient::Post, id: 5)
+      attributes = {title: "Foo"}
 
-      stub_request(:post, "#{base_url}/wp/v2/posts").with(
-        headers: {"content-type" => "application/json; charset=#{encoding}"},
-        body: {"title" => "Foo"}.to_json,
-      ).to_return(
-        status: 201, # Created
-        headers: {
-          "Content-Type" => "application/json; charset=utf-8",
-          "Location" => "#{base_url}/wp/v2/posts/#{id}"
-        }
-      )
+      expect(connection).to receive(:create).with(
+        Wpclient::Post, "posts", attributes, redirect_params: {_embed: nil}
+      ).and_return post
 
-      stub_request(:get, "#{base_url}/wp/v2/posts/#{id}?_embed").to_return(
-        headers: {"content-type" => "application/json; charset=utf-8"},
-        body: post_fixture.to_json,
-      )
+      # We don't expect here as the `create` call below could be enough, but
+      # it's also very possible that we need to fetch the post again after
+      # doing other things to it.
+      allow(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post)
 
-      response = client.create_post(title: "Foo")
-      expect(response).to be_instance_of(Wpclient::Post)
-      expect(response.id).to eq id
+      expect(client.create_post(attributes)).to eq post
     end
 
-    it "raises validation error when post could not be created" do
-      error_contents = json_fixture("validation-error.json")
-
-      stub_request(:any, /./).to_return(
-        status: 400,
-        headers: {"content-type" => "application/json"},
-        body: error_contents.to_json,
-      )
-
-      expect {
-        client.create_post({})
-      }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
-    end
+    it "adds metadata to the post"
+    it "changes categories of the post"
   end
 
   describe "updating a post" do
-    it "sends the diff as a PATCH on the post resource" do
-      post_fixture = json_fixture("simple-post.json")
-      encoding = "".encoding
+    it "embeds linked resources" do
+      post = instance_double(Wpclient::Post)
 
-      stub_request(:patch, "#{base_url}/wp/v2/posts/42?_embed").with(
-        headers: {"content-type" => "application/json; charset=#{encoding}"},
-        body: {title: "New title"}.to_json,
-      ).to_return(
-        headers: {"content-type" => "application/json"},
-        body: post_fixture.to_json,
-      )
+      expect(connection).to receive(:patch).with(
+        Wpclient::Post, "posts/5?_embed", hash_including(title: "Foo")
+      ).and_return(post)
 
-      post = client.update_post(42, title: "New title")
-      expect(post).to be_instance_of(Wpclient::Post)
-      expect(post.title).to eq Wpclient::Post.parse(post_fixture).title
+      expect(client.update_post(5, title: "Foo")).to eq post
     end
 
-    it "raises ValidationError when server rejects changes" do
-      error_contents = json_fixture("validation-error.json")
+    it "adds metadata to the post"
+    it "changes categories of the post"
+  end
 
-      stub_request(:any, /./).to_return(
-        status: 400,
-        headers: {"content-type" => "application/json"},
-        body: error_contents.to_json,
-      )
-
-      expect {
-        client.update_post(1, {})
-      }.to raise_error(Wpclient::ValidationError, error_contents.first.fetch("message"))
-    end
-
-    it "raises NotFound when trying to update non-existing ID" do
-      error_contents = json_fixture("invalid-post-id.json")
-
-      stub_request(:any, /./).to_return(
-        status: 400,
-        headers: {"content-type" => "application/json"},
-        body: error_contents.to_json,
-      )
-
-      expect {
-        client.update_post(1, {})
-      }.to raise_error(Wpclient::NotFoundError, "Post ID is not found")
-    end
+  describe "categories" do
+    it "can be listed"
+    it "can be created"
+    it "can be updated"
+    it "can be deleted"
   end
 end
