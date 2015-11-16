@@ -18,6 +18,10 @@ module Wpclient
       end
     end
 
+    def replace(new_list)
+      @entries.replace(new_list)
+    end
+
     #
     # Pagination methods. Fulfilling will_paginate protocol
     #

@@ -32,6 +32,14 @@ module Wpclient
       ).to eq 3
     end
 
+    it "allows replacement of the entries list" do
+      # Useful if you want to decorate the entries, or something along those
+      # lines.
+      collection = PaginatedCollection.new([1, 2, 3], total: 3, per_page: 10, current_page: 1)
+      collection.replace(collection.map { |n| n * 2 })
+      expect(collection.to_a).to eq [2, 4, 6]
+    end
+
     describe "pagination attributes" do
       def collection(total: 1, per_page: 1, current_page: 1)
         PaginatedCollection.new([], total: total, per_page: per_page, current_page: current_page)
