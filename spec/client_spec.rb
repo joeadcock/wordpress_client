@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Wpclient::Client  do
+describe Wpclient::Client do
   subject(:client) { Wpclient::Client.new(connection) }
   let(:connection) { instance_double(Wpclient::Connection) }
 

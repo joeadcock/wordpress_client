@@ -62,18 +62,6 @@ module Wpclient
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
-    def assign_meta_to_post(post_id:, key:, value:)
-      connection.create_without_response("posts/#{post_id}/meta", key: key, value: value)
-    end
-
-    def remove_meta_from_post(post_id:, meta_id:)
-      connection.delete("posts/#{post_id}/meta/#{meta_id}", force: true)
-    end
-
-    def update_meta_on_post(post_id:, meta_id:, key:, value:)
-      connection.patch_without_response("posts/#{post_id}/meta/#{meta_id}", key: key, value: value)
-    end
-
     def inspect
       "#<Wpclient::Client #{connection.inspect}>"
     end
@@ -86,7 +74,7 @@ module Wpclient
     end
 
     def assign_meta(post, meta)
-      ReplaceMetadata.call(self, post, meta) if meta
+      ReplaceMetadata.call(connection, post, meta) if meta
     end
   end
 end
