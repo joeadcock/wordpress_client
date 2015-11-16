@@ -1,9 +1,9 @@
 rspec_options = {
-  cmd: 'rspec -f documentation',
+  cmd: 'rspec -f documentation -t focus',
   failed_mode: :keep,
   all_after_pass: true,
   all_on_start: true,
-  run_all: {cmd: 'rspec -f progress'}
+  run_all: {cmd: 'rspec -f progress -t focus'}
 }
 
 guard :rspec, rspec_options do

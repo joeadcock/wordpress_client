@@ -15,6 +15,8 @@ RSpec.configure do |config|
   config.extend IntegrationMacros
   config.include Fixtures
 
+  config.run_all_when_everything_filtered = true
+
   config.before do
     WebMock.disable_net_connect!(allow_localhost: false)
   end

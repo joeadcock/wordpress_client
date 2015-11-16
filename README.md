@@ -38,7 +38,15 @@ Run tests using the normal `rspec` command after installing all bundles. The fir
 bundle exec rspec
 ```
 
-You can also run `bundle exec guard` to have tests run automatically when you change files in the repo.
+You can also run `bundle exec guard` to have tests run automatically when you change files in the repo. If you tag your examples with `focus: true`, Guard will only run those tests. This can help when doing very focused coding, but remember to remove the filter before you commit and let the entire suite run.
+
+```ruby
+describe Foo, focus: true do
+  # ...
+end
+```
+
+The normal `rspec` command will *not* use this filter in case it is ever committed accidentally, so CI can catch any problems.
 
 ## Copyright & License
 
