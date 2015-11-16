@@ -21,8 +21,13 @@ describe Wpclient::Client do
       expect(client.posts).to eq []
     end
 
-    it "can find using a slug"
-    it "raises NotFoundError when trying to find by slug yields no posts"
+    it "can filter on category slugs" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(filter: {category_name: "my-cat"})
+      ).and_return []
+
+      expect(client.posts(category_slug: "my-cat")).to eq []
+    end
   end
 
   describe "fetching a single post" do
@@ -34,6 +39,26 @@ describe Wpclient::Client do
       ).and_return post
 
       expect(client.find_post(5)).to eq post
+    end
+
+    it "can find using a slug" do
+      post = instance_double(Wpclient::Post)
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(filter: {name: "my-slug"})
+      ).and_return [post]
+
+      expect(client.find_by_slug("my-slug")).to eq post
+    end
+
+    it "raises NotFoundError when trying to find by slug yields no posts" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(filter: {name: "my-slug"}, per_page: 1)
+      ).and_return []
+
+      expect {
+        client.find_by_slug("my-slug")
+      }.to raise_error(Wpclient::NotFoundError, /my-slug/)
     end
   end
 

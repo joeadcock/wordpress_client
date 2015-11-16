@@ -7,8 +7,12 @@ module Wpclient
       @connection = connection
     end
 
-    def posts(per_page: 10, page: 1)
-      connection.get_multiple(Post, "posts", per_page: per_page, page: page, _embed: nil)
+    def posts(per_page: 10, page: 1, category_slug: nil)
+      filter = {}
+      filter[:category_name] = category_slug if category_slug
+      connection.get_multiple(
+        Post, "posts", per_page: per_page, page: page, _embed: nil, filter: filter
+      )
     end
 
     def find_post(id)

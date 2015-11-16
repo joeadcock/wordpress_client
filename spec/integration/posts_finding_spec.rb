@@ -3,6 +3,17 @@ require "spec_helper"
 describe "Posts (finding)" do
   setup_integration_client
 
+  it "can list articles in a specific category" do
+    category = client.create_category(name: "Filtering time", slug: "filtering")
+    post = client.create_post(
+      category_ids: [category.id],
+      status: "publish",
+      title: "Some title",
+    )
+
+    expect(client.posts(category_slug: "filtering").map(&:id)).to eq [post.id]
+  end
+
   describe "finding by slug" do
     it "finds the matching post" do
       post = client.create_post(title: "Oh hai", slug: "oh-hai")
