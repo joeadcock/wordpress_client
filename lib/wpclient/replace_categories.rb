@@ -2,12 +2,12 @@ require "set"
 
 module Wpclient
   class ReplaceCategories
-    def self.call(client, post, category_ids)
-      new(client, post, category_ids).replace
+    def self.call(connection, post, category_ids)
+      new(connection, post, category_ids).replace
     end
 
-    def initialize(client, post, category_ids)
-      @client = client
+    def initialize(connection, post, category_ids)
+      @connection = connection
       @post = post
       @wanted_ids = category_ids.to_set
       @existing_ids = post.category_ids.to_set
@@ -19,7 +19,7 @@ module Wpclient
     end
 
     private
-    attr_reader :client, :post, :wanted_ids, :existing_ids
+    attr_reader :connection, :post, :wanted_ids, :existing_ids
 
     def categories_to_add
       wanted_ids - existing_ids
@@ -30,11 +30,11 @@ module Wpclient
     end
 
     def add_category_id(id)
-      client.assign_category_to_post(post_id: post.id, category_id: id)
+      connection.create_without_response("posts/#{post.id}/terms/category/#{id}", {})
     end
 
     def remove_category_id(id)
-      client.remove_category_from_post(post_id: post.id, category_id: id)
+      connection.delete("posts/#{post.id}/terms/category/#{id}", force: true)
     end
   end
 end

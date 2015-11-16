@@ -4,7 +4,7 @@ describe Wpclient::Post do
   let(:fixture) { json_fixture("simple-post.json") }
 
   it "can be parsed from JSON data" do
-    post = Wpclient::Post.new(fixture)
+    post = Wpclient::Post.parse(fixture)
 
     expect(post.id).to eq 1
     expect(post.title).to eq "Hello world!"
@@ -27,7 +27,7 @@ describe Wpclient::Post do
   end
 
   it "parses categories" do
-    post = Wpclient::Post.new(fixture)
+    post = Wpclient::Post.parse(fixture)
 
     expect(post.categories).to eq [
       Wpclient::Category.new(
@@ -40,7 +40,7 @@ describe Wpclient::Post do
 
   describe "dates" do
     it "uses GMT times if available" do
-      post = Wpclient::Post.new(fixture.merge(
+      post = Wpclient::Post.parse(fixture.merge(
         "date_gmt" => "2001-01-01T15:00:00",
         "date" => "2001-01-01T12:00:00",
         "modified_gmt" => "2001-01-01T15:00:00",
@@ -52,7 +52,7 @@ describe Wpclient::Post do
     end
 
     it "falls back to local time if no GMT date is provided" do
-      post = Wpclient::Post.new(fixture.merge(
+      post = Wpclient::Post.parse(fixture.merge(
         "date_gmt" => nil,
         "date" => "2001-01-01T12:00:00",
         "modified_gmt" => nil,
@@ -66,23 +66,23 @@ describe Wpclient::Post do
 
   describe "metadata" do
     it "is parsed into a hash" do
-      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      post = Wpclient::Post.parse(json_fixture("post-with-metadata.json"))
       expect(post.meta).to eq "foo" => "bar"
     end
 
     it "raises UnauthorizedError when post it is forbidden" do
       expect {
-        Wpclient::Post.new(json_fixture("post-with-forbidden-metadata.json"))
+        Wpclient::Post.parse(json_fixture("post-with-forbidden-metadata.json"))
       }.to raise_error(Wpclient::UnauthorizedError)
     end
 
     it "keeps track of the ID of each metadata key" do
-      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      post = Wpclient::Post.parse(json_fixture("post-with-metadata.json"))
       expect(post.meta_id_for("foo")).to eq 2
     end
 
     it "raises ArgumentError when asked for the meta ID of a meta key not present" do
-      post = Wpclient::Post.new(json_fixture("post-with-metadata.json"))
+      post = Wpclient::Post.parse(json_fixture("post-with-metadata.json"))
       expect {
         post.meta_id_for("clearly unreal")
       }.to raise_error(ArgumentError, /clearly unreal/)
