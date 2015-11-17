@@ -34,8 +34,16 @@ module Wpclient
       connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
     end
 
+    def tags(per_page: 10, page: 1)
+      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+    end
+
     def find_category(id)
       connection.get(Category, "terms/category/#{id.to_i}")
+    end
+
+    def find_tag(id)
+      connection.get(Tag, "terms/tag/#{id.to_i}")
     end
 
     def create_post(attributes)
@@ -49,6 +57,10 @@ module Wpclient
 
     def create_category(attributes)
       connection.create(Category, "terms/category", attributes)
+    end
+
+    def create_tag(attributes)
+      connection.create(Tag, "terms/tag", attributes)
     end
 
     def update_post(id, attributes)
@@ -66,6 +78,10 @@ module Wpclient
 
     def update_category(id, attributes)
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
+    end
+
+    def update_tag(id, attributes)
+      connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
     end
 
     def inspect

@@ -197,4 +197,48 @@ describe Wpclient::Client do
       expect(client.update_category(45, name: "New")).to eq category
     end
   end
+
+  describe "tags" do
+    it "can be listed" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Tag, "terms/tag", hash_including(page: 1, per_page: 10)
+      )
+      client.tags
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Tag, "terms/tag", hash_including(page: 2, per_page: 60)
+      )
+      client.tags(page: 2, per_page: 60)
+    end
+
+    it "can be found" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Tag, "terms/tag/12"
+      ).and_return tag
+
+      expect(client.find_tag(12)).to eq tag
+    end
+
+    it "can be created" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:create).with(
+        Wpclient::Tag, "terms/tag", name: "Foo"
+      ).and_return tag
+
+      expect(client.create_tag(name: "Foo")).to eq tag
+    end
+
+    it "can be updated" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Tag, "terms/tag/45", name: "New"
+      ).and_return tag
+
+      expect(client.update_tag(45, name: "New")).to eq tag
+    end
+  end
 end
