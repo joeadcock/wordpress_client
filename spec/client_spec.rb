@@ -81,8 +81,35 @@ describe Wpclient::Client do
       expect(client.create_post(attributes)).to eq post
     end
 
-    it "adds metadata to the post"
-    it "changes categories of the post"
+    it "adds metadata to the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceMetadata).to receive(:call).with(
+        connection, post, {"hello" => "world"}
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.create_post(title: "Foo", meta: {"hello" => "world"})
+    end
+
+    it "changes categories of the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceCategories).to receive(:call).with(
+        connection, post, [1, 3, 7]
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.create_post(title: "Foo", category_ids: [1, 3, 7])
+    end
   end
 
   describe "updating a post" do
@@ -96,8 +123,35 @@ describe Wpclient::Client do
       expect(client.update_post(5, title: "Foo")).to eq post
     end
 
-    it "adds metadata to the post"
-    it "changes categories of the post"
+    it "adds metadata to the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceMetadata).to receive(:call).with(
+        connection, post, {"hello" => "world"}
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.update_post(5, title: "Foo", meta: {"hello" => "world"})
+    end
+
+    it "changes categories of the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceCategories).to receive(:call).with(
+        connection, post, [1, 3, 7]
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.update_post(5, title: "Foo", category_ids: [1, 3, 7])
+    end
   end
 
   describe "categories" do
