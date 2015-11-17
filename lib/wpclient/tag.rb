@@ -1,4 +1,4 @@
 module Wpclient
-  class Category < Term
+  class Tag < Term
   end
 end

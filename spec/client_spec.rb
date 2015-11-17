@@ -81,8 +81,66 @@ describe Wpclient::Client do
       expect(client.create_post(attributes)).to eq post
     end
 
-    it "adds metadata to the post"
-    it "changes categories of the post"
+    it "adds metadata to the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).with(
+        connection, post, {"hello" => "world"}
+      ).and_return(0)
+
+      client.create_post(title: "Foo", meta: {"hello" => "world"})
+    end
+
+    it "sets categories of the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
+        connection, post, [1, 3, 7]
+      ).and_return(0)
+
+      client.create_post(title: "Foo", category_ids: [1, 3, 7])
+    end
+
+    it "sets tags of the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
+        connection, post, [1, 3, 7]
+      ).and_return(0)
+
+      client.create_post(title: "Foo", tag_ids: [1, 3, 7])
+    end
+
+    it "refreshes the post if terms or categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(1)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(1)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(1)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post)
+
+      client.create_post(title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
+
+    it "does not refresh the post if neither terms nor categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(0)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(0)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(0)
+
+      expect(connection).to_not receive(:get)
+
+      client.create_post(title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
   end
 
   describe "updating a post" do
@@ -96,14 +154,153 @@ describe Wpclient::Client do
       expect(client.update_post(5, title: "Foo")).to eq post
     end
 
-    it "adds metadata to the post"
-    it "changes categories of the post"
+    it "adds metadata to the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).with(
+        connection, post, {"hello" => "world"}
+      ).and_return(0)
+
+      client.update_post(5, title: "Foo", meta: {"hello" => "world"})
+    end
+
+    it "changes categories of the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
+        connection, post, [1, 3, 7]
+      ).and_return(0)
+
+      client.update_post(5, title: "Foo", category_ids: [1, 3, 7])
+    end
+
+    it "changes tags of the post" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
+        connection, post, [1, 3, 7]
+      ).and_return(0)
+
+      client.update_post(5, title: "Foo", tag_ids: [1, 3, 7])
+    end
+
+    it "refreshes the post if terms or categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(1)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(1)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(1)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post)
+
+      client.update_post(5, title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
+
+    it "does not refresh the post if neither terms nor categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(0)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(0)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(0)
+
+      expect(connection).to_not receive(:get)
+
+      client.update_post(5, title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
   end
 
   describe "categories" do
-    it "can be listed"
-    it "can be created"
-    it "can be updated"
-    it "can be deleted"
+    it "can be listed" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Category, "terms/category", hash_including(page: 1, per_page: 10)
+      )
+      client.categories
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Category, "terms/category", hash_including(page: 2, per_page: 60)
+      )
+      client.categories(page: 2, per_page: 60)
+    end
+
+    it "can be found" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Category, "terms/category/12"
+      ).and_return category
+
+      expect(client.find_category(12)).to eq category
+    end
+
+    it "can be created" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:create).with(
+        Wpclient::Category, "terms/category", name: "Foo"
+      ).and_return category
+
+      expect(client.create_category(name: "Foo")).to eq category
+    end
+
+    it "can be updated" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Category, "terms/category/45", name: "New"
+      ).and_return category
+
+      expect(client.update_category(45, name: "New")).to eq category
+    end
+  end
+
+  describe "tags" do
+    it "can be listed" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Tag, "terms/tag", hash_including(page: 1, per_page: 10)
+      )
+      client.tags
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Tag, "terms/tag", hash_including(page: 2, per_page: 60)
+      )
+      client.tags(page: 2, per_page: 60)
+    end
+
+    it "can be found" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Tag, "terms/tag/12"
+      ).and_return tag
+
+      expect(client.find_tag(12)).to eq tag
+    end
+
+    it "can be created" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:create).with(
+        Wpclient::Tag, "terms/tag", name: "Foo"
+      ).and_return tag
+
+      expect(client.create_tag(name: "Foo")).to eq tag
+    end
+
+    it "can be updated" do
+      tag = instance_double(Wpclient::Tag)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Tag, "terms/tag/45", name: "New"
+      ).and_return tag
+
+      expect(client.update_tag(45, name: "New")).to eq tag
+    end
   end
 end

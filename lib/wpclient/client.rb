@@ -34,30 +34,50 @@ module Wpclient
       connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
     end
 
+    def tags(per_page: 10, page: 1)
+      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+    end
+
     def find_category(id)
       connection.get(Category, "terms/category/#{id.to_i}")
+    end
+
+    def find_tag(id)
+      connection.get(Tag, "terms/tag/#{id.to_i}")
     end
 
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
-      assign_meta(post, attributes[:meta])
-      assign_categories(post, attributes[:category_ids])
+      changes = 0
+      changes += assign_meta(post, attributes[:meta])
+      changes += assign_categories(post, attributes[:category_ids])
+      changes += assign_tags(post, attributes[:tag_ids])
 
-      find_post(post.id)
+      if changes > 0
+        find_post(post.id)
+      else
+        post
+      end
     end
 
     def create_category(attributes)
       connection.create(Category, "terms/category", attributes)
     end
 
+    def create_tag(attributes)
+      connection.create(Tag, "terms/tag", attributes)
+    end
+
     def update_post(id, attributes)
       post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
 
-      assign_meta(post, attributes[:meta])
-      assign_categories(post, attributes[:category_ids])
+      changes = 0
+      changes += assign_meta(post, attributes[:meta])
+      changes += assign_categories(post, attributes[:category_ids])
+      changes += assign_tags(post, attributes[:tag_ids])
 
-      if attributes.has_key?(:meta) || attributes.has_key?(:category_ids)
+      if changes > 0
         find_post(post.id)
       else
         post
@@ -68,6 +88,10 @@ module Wpclient
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
+    def update_tag(id, attributes)
+      connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
+    end
+
     def inspect
       "#<Wpclient::Client #{connection.inspect}>"
     end
@@ -75,12 +99,19 @@ module Wpclient
     private
     attr_reader :connection
 
-    def assign_categories(post, category_ids)
-      ReplaceCategories.call(connection, post, category_ids) if category_ids
+    def assign_categories(post, ids)
+      return 0 unless ids
+      ReplaceTerms.apply_categories(connection, post, ids)
+    end
+
+    def assign_tags(post, ids)
+      return 0 unless ids
+      ReplaceTerms.apply_tags(connection, post, ids)
     end
 
     def assign_meta(post, meta)
-      ReplaceMetadata.call(connection, post, meta) if meta
+      return 0 unless meta
+      ReplaceMetadata.apply(connection, post, meta)
     end
   end
 end

@@ -6,7 +6,7 @@ module Wpclient
       :id, :title, :slug, :url, :guid,
       :excerpt_html, :content_html,
       :updated_at, :date,
-      :categories, :meta
+      :categories, :tags, :meta
     )
 
     def self.parse(data)
@@ -40,6 +40,8 @@ module Wpclient
     end
 
     def category_ids() categories.map(&:id) end
+
+    def tag_ids() tags.map(&:id) end
 
     def meta_id_for(key)
       @meta_ids[key] || raise(ArgumentError, "Post does not have meta #{key.inspect}")

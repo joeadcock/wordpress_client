@@ -2,18 +2,23 @@ require "set"
 
 module Wpclient
   class ReplaceMetadata
-    def self.call(connection, post, meta)
-      new(connection, post, meta).call
+    def self.apply(connection, post, meta)
+      instance = new(connection, post, meta)
+      instance.apply
+      instance.number_of_changes
     end
+
+    attr_reader :number_of_changes
 
     def initialize(connection, post, meta)
       @connection = connection
       @post = post
       @existing_meta = post.meta
       @new_meta = stringify_keys(meta)
+      @number_of_changes = 0
     end
 
-    def call
+    def apply
       all_keys.each do |key|
         action = determine_action(key)
         send(action, key, new_meta[key])
@@ -48,16 +53,19 @@ module Wpclient
 
     def add(key, value)
       connection.create_without_response("posts/#{post.id}/meta", key: key, value: value)
+      @number_of_changes += 1
     end
 
     def remove(key, *)
       connection.delete("posts/#{post.id}/meta/#{meta_id(key)}", force: true)
+      @number_of_changes += 1
     end
 
     def replace(key, value)
       connection.patch_without_response(
         "posts/#{post.id}/meta/#{meta_id(key)}", key: key, value: value
       )
+      @number_of_changes += 1
     end
 
     def keep(*)

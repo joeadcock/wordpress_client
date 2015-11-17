@@ -1,0 +1,1 @@
+{"id":2,"count":1,"description":"","link":"http:\/\/192.168.99.100:8080\/tag\/foo\/","name":"Foo","slug":"foo","taxonomy":"post_tag","_links":{"self":[{"href":"http:\/\/192.168.99.100:8080\/wp-json\/wp\/v2\/terms\/tag\/2"}],"collection":[{"href":"http:\/\/192.168.99.100:8080\/wp-json\/wp\/v2\/terms\/tag"}]}}
