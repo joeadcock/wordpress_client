@@ -25,6 +25,7 @@ module Wpclient
 
     def assign_basic(post)
       post.id = data["id"]
+      post.slug = data["slug"]
       post.url = data["link"]
       post.updated_at = read_date("modified")
       post.date = read_date("date")

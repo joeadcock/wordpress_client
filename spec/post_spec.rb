@@ -8,6 +8,7 @@ describe Wpclient::Post do
 
     expect(post.id).to eq 1
     expect(post.title).to eq "Hello world!"
+    expect(post.slug).to eq "hello-world"
 
     expect(post.url).to eq "http://example.com/2015/11/03/hello-world/"
     expect(post.guid).to eq "http://example.com/?p=1"
