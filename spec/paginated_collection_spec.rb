@@ -74,6 +74,16 @@ module Wpclient
         expect(collection(total: 2, per_page: 1, current_page: 3)).to be_out_of_bounds
         expect(collection(total: 2, per_page: 1, current_page: 0)).to be_out_of_bounds
       end
+
+      # Only to be compatible with will_paginate < 3.0
+      it "has an offset" do
+        expect(collection(per_page:  5, current_page: 1).offset).to eq 0
+        expect(collection(per_page:  5, current_page: 2).offset).to eq 5
+        expect(collection(per_page: 50, current_page: 3).offset).to eq 100
+
+        expect(collection(per_page: 50, current_page: 0).offset).to eq 0
+        expect(collection(per_page:  0, current_page: 0).offset).to eq 0
+      end
     end
   end
 end

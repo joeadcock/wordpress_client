@@ -52,6 +52,15 @@ module Wpclient
       current_page < 1 || current_page > total_pages
     end
 
+    # will_paginate < 3.0 has this method
+    def offset
+      if current_page > 0
+        (current_page - 1) * per_page
+      else
+        0
+      end
+    end
+
     #
     # Array-like behavior
     #
