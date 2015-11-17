@@ -8,4 +8,8 @@ module Fixtures
   def json_fixture(name)
     JSON.parse(fixture_contents(name))
   end
+
+  def open_fixture(name)
+    FixtureRoot.join(name).open('r') { |file| yield file }
+  end
 end
