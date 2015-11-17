@@ -96,11 +96,11 @@ describe Wpclient::Client do
       client.create_post(title: "Foo", meta: {"hello" => "world"})
     end
 
-    it "changes categories of the post and refreshes" do
+    it "sets categories of the post and refreshes" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:create).and_return(post)
 
-      expect(Wpclient::ReplaceCategories).to receive(:call).with(
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
         connection, post, [1, 3, 7]
       ).ordered
 
@@ -109,6 +109,21 @@ describe Wpclient::Client do
       ).and_return(post).ordered
 
       client.create_post(title: "Foo", category_ids: [1, 3, 7])
+    end
+
+    it "sets tags of the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
+        connection, post, [1, 3, 7]
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.create_post(title: "Foo", tag_ids: [1, 3, 7])
     end
   end
 
@@ -142,7 +157,7 @@ describe Wpclient::Client do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:patch).and_return(post)
 
-      expect(Wpclient::ReplaceCategories).to receive(:call).with(
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
         connection, post, [1, 3, 7]
       ).ordered
 
@@ -151,6 +166,21 @@ describe Wpclient::Client do
       ).and_return(post).ordered
 
       client.update_post(5, title: "Foo", category_ids: [1, 3, 7])
+    end
+
+    it "changes tags of the post and refreshes" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
+        connection, post, [1, 3, 7]
+      ).ordered
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Post, "posts/5", hash_including(_embed: nil)
+      ).and_return(post).ordered
+
+      client.update_post(5, title: "Foo", tag_ids: [1, 3, 7])
     end
   end
 

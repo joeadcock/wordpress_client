@@ -51,6 +51,7 @@ module Wpclient
 
       assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+      assign_tags(post, attributes[:tag_ids])
 
       find_post(post.id)
     end
@@ -68,8 +69,13 @@ module Wpclient
 
       assign_meta(post, attributes[:meta])
       assign_categories(post, attributes[:category_ids])
+      assign_tags(post, attributes[:tag_ids])
 
-      if attributes.has_key?(:meta) || attributes.has_key?(:category_ids)
+      if (
+          attributes.has_key?(:meta) ||
+          attributes.has_key?(:category_ids) ||
+          attributes.has_key?(:tag_ids)
+      )
         find_post(post.id)
       else
         post
@@ -91,8 +97,12 @@ module Wpclient
     private
     attr_reader :connection
 
-    def assign_categories(post, category_ids)
-      ReplaceCategories.call(connection, post, category_ids) if category_ids
+    def assign_categories(post, ids)
+      ReplaceTerms.apply_categories(connection, post, ids) if ids
+    end
+
+    def assign_tags(post, ids)
+      ReplaceTerms.apply_tags(connection, post, ids) if ids
     end
 
     def assign_meta(post, meta)
