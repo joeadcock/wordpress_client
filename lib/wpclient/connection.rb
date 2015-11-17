@@ -1,3 +1,6 @@
+require "faraday"
+require "json"
+
 module Wpclient
   class Connection
     attr_reader :url, :username

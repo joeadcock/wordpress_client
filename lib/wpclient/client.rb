@@ -1,6 +1,3 @@
-require "faraday"
-require "json"
-
 module Wpclient
   class Client
     def initialize(connection)
