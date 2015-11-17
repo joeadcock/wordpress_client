@@ -10,8 +10,6 @@ module Wpclient
       @per_page = per_page
     end
 
-    alias total_entries total
-
     def each
       if block_given?
         @entries.each { |e| yield e }
@@ -27,6 +25,8 @@ module Wpclient
     #
     # Pagination methods. Fulfilling will_paginate protocol
     #
+
+    alias total_entries total
 
     def total_pages
       if total.zero? || per_page.zero?
