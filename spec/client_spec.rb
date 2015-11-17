@@ -155,9 +155,46 @@ describe Wpclient::Client do
   end
 
   describe "categories" do
-    it "can be listed"
-    it "can be created"
-    it "can be updated"
-    it "can be deleted"
+    it "can be listed" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Category, "terms/category", hash_including(page: 1, per_page: 10)
+      )
+      client.categories
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Category, "terms/category", hash_including(page: 2, per_page: 60)
+      )
+      client.categories(page: 2, per_page: 60)
+    end
+
+    it "can be found" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:get).with(
+        Wpclient::Category, "terms/category/12"
+      ).and_return category
+
+      expect(client.find_category(12)).to eq category
+    end
+
+    it "can be created" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:create).with(
+        Wpclient::Category, "terms/category", name: "Foo"
+      ).and_return category
+
+      expect(client.create_category(name: "Foo")).to eq category
+    end
+
+    it "can be updated" do
+      category = instance_double(Wpclient::Category)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Category, "terms/category/45", name: "New"
+      ).and_return category
+
+      expect(client.update_category(45, name: "New")).to eq category
+    end
   end
 end
