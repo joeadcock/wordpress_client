@@ -49,11 +49,16 @@ module Wpclient
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
-      assign_meta(post, attributes[:meta])
-      assign_categories(post, attributes[:category_ids])
-      assign_tags(post, attributes[:tag_ids])
+      changes = 0
+      changes += assign_meta(post, attributes[:meta])
+      changes += assign_categories(post, attributes[:category_ids])
+      changes += assign_tags(post, attributes[:tag_ids])
 
-      find_post(post.id)
+      if changes > 0
+        find_post(post.id)
+      else
+        post
+      end
     end
 
     def create_category(attributes)
@@ -67,15 +72,12 @@ module Wpclient
     def update_post(id, attributes)
       post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
 
-      assign_meta(post, attributes[:meta])
-      assign_categories(post, attributes[:category_ids])
-      assign_tags(post, attributes[:tag_ids])
+      changes = 0
+      changes += assign_meta(post, attributes[:meta])
+      changes += assign_categories(post, attributes[:category_ids])
+      changes += assign_tags(post, attributes[:tag_ids])
 
-      if (
-          attributes.has_key?(:meta) ||
-          attributes.has_key?(:category_ids) ||
-          attributes.has_key?(:tag_ids)
-      )
+      if changes > 0
         find_post(post.id)
       else
         post
@@ -98,15 +100,18 @@ module Wpclient
     attr_reader :connection
 
     def assign_categories(post, ids)
-      ReplaceTerms.apply_categories(connection, post, ids) if ids
+      return 0 unless ids
+      ReplaceTerms.apply_categories(connection, post, ids)
     end
 
     def assign_tags(post, ids)
-      ReplaceTerms.apply_tags(connection, post, ids) if ids
+      return 0 unless ids
+      ReplaceTerms.apply_tags(connection, post, ids)
     end
 
     def assign_meta(post, meta)
-      ReplaceMetadata.call(connection, post, meta) if meta
+      return 0 unless meta
+      ReplaceMetadata.apply(connection, post, meta)
     end
   end
 end

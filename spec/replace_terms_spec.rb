@@ -39,5 +39,13 @@ module Wpclient
 
       ReplaceTerms.apply_tags(connection, post, [10])
     end
+
+    it "returns the amount of changes made" do
+      connection = double(Connection).as_null_object
+      post = double(Post, id: 40, tag_ids: [8, 9, 10])
+
+      result = ReplaceTerms.apply_tags(connection, post, [10, 11])
+      expect(result).to eq 3
+    end
   end
 end

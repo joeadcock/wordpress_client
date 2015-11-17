@@ -81,49 +81,65 @@ describe Wpclient::Client do
       expect(client.create_post(attributes)).to eq post
     end
 
-    it "adds metadata to the post and refreshes" do
+    it "adds metadata to the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:create).and_return(post)
 
-      expect(Wpclient::ReplaceMetadata).to receive(:call).with(
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).with(
         connection, post, {"hello" => "world"}
-      ).ordered
-
-      expect(connection).to receive(:get).with(
-        Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(0)
 
       client.create_post(title: "Foo", meta: {"hello" => "world"})
     end
 
-    it "sets categories of the post and refreshes" do
+    it "sets categories of the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:create).and_return(post)
 
       expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
         connection, post, [1, 3, 7]
-      ).ordered
-
-      expect(connection).to receive(:get).with(
-        Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(0)
 
       client.create_post(title: "Foo", category_ids: [1, 3, 7])
     end
 
-    it "sets tags of the post and refreshes" do
+    it "sets tags of the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:create).and_return(post)
 
       expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
         connection, post, [1, 3, 7]
-      ).ordered
+      ).and_return(0)
+
+      client.create_post(title: "Foo", tag_ids: [1, 3, 7])
+    end
+
+    it "refreshes the post if terms or categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(1)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(1)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(1)
 
       expect(connection).to receive(:get).with(
         Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(post)
 
-      client.create_post(title: "Foo", tag_ids: [1, 3, 7])
+      client.create_post(title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
+
+    it "does not refresh the post if neither terms nor categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:create).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(0)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(0)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(0)
+
+      expect(connection).to_not receive(:get)
+
+      client.create_post(title: "Foo", tag_ids: [], category_ids: [], meta: {})
     end
   end
 
@@ -138,49 +154,65 @@ describe Wpclient::Client do
       expect(client.update_post(5, title: "Foo")).to eq post
     end
 
-    it "adds metadata to the post and refreshes" do
+    it "adds metadata to the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:patch).and_return(post)
 
-      expect(Wpclient::ReplaceMetadata).to receive(:call).with(
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).with(
         connection, post, {"hello" => "world"}
-      ).ordered
-
-      expect(connection).to receive(:get).with(
-        Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(0)
 
       client.update_post(5, title: "Foo", meta: {"hello" => "world"})
     end
 
-    it "changes categories of the post and refreshes" do
+    it "changes categories of the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:patch).and_return(post)
 
       expect(Wpclient::ReplaceTerms).to receive(:apply_categories).with(
         connection, post, [1, 3, 7]
-      ).ordered
-
-      expect(connection).to receive(:get).with(
-        Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(0)
 
       client.update_post(5, title: "Foo", category_ids: [1, 3, 7])
     end
 
-    it "changes tags of the post and refreshes" do
+    it "changes tags of the post" do
       post = instance_double(Wpclient::Post, id: 5)
       allow(connection).to receive(:patch).and_return(post)
 
       expect(Wpclient::ReplaceTerms).to receive(:apply_tags).with(
         connection, post, [1, 3, 7]
-      ).ordered
+      ).and_return(0)
+
+      client.update_post(5, title: "Foo", tag_ids: [1, 3, 7])
+    end
+
+    it "refreshes the post if terms or categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(1)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(1)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(1)
 
       expect(connection).to receive(:get).with(
         Wpclient::Post, "posts/5", hash_including(_embed: nil)
-      ).and_return(post).ordered
+      ).and_return(post)
 
-      client.update_post(5, title: "Foo", tag_ids: [1, 3, 7])
+      client.update_post(5, title: "Foo", tag_ids: [], category_ids: [], meta: {})
+    end
+
+    it "does not refresh the post if neither terms nor categories changed" do
+      post = instance_double(Wpclient::Post, id: 5)
+      allow(connection).to receive(:patch).and_return(post)
+
+      expect(Wpclient::ReplaceTerms).to receive(:apply_tags).and_return(0)
+      expect(Wpclient::ReplaceTerms).to receive(:apply_categories).and_return(0)
+      expect(Wpclient::ReplaceMetadata).to receive(:apply).and_return(0)
+
+      expect(connection).to_not receive(:get)
+
+      client.update_post(5, title: "Foo", tag_ids: [], category_ids: [], meta: {})
     end
   end
 
