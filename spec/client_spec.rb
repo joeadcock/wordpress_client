@@ -1,4 +1,5 @@
 require "spec_helper"
+require "tmpdir"
 
 describe Wpclient::Client do
   subject(:client) { Wpclient::Client.new(connection) }
@@ -330,6 +331,25 @@ describe Wpclient::Client do
       ).and_return media
 
       expect(client.upload(io, mime_type: "text/plain", filename: "foo.txt")).to eq media
+    end
+
+    it "can be uploaded from files" do
+      media = instance_double(Wpclient::Media)
+
+      Dir.mktmpdir do |dir|
+        file = File.join(dir, "test.txt")
+        File.write(file, "hello world")
+
+        expect(connection).to receive(:upload) do |_, _, io, filename:, mime_type:|
+          expect(filename).to eq "test.txt"
+          expect(mime_type).to eq "text/plain"
+
+          expect(io.read).to eq "hello world"
+          media
+        end
+
+        expect(client.upload_file(file, mime_type: "text/plain")).to eq media
+      end
     end
 
     it "can be found" do

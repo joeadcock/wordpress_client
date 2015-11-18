@@ -1,8 +1,12 @@
 module Fixtures
   FixtureRoot = Pathname.new(File.expand_path("../../fixtures", __FILE__))
 
+  def fixture_path(name)
+    FixtureRoot.join(name)
+  end
+
   def fixture_contents(name)
-    FixtureRoot.join(name).read
+    fixture_path(name).read
   end
 
   def json_fixture(name)
@@ -10,6 +14,6 @@ module Fixtures
   end
 
   def open_fixture(name)
-    FixtureRoot.join(name).open('r') { |file| yield file }
+    fixture_path(name).open('r') { |file| yield file }
   end
 end

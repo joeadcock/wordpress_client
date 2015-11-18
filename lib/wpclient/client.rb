@@ -106,6 +106,13 @@ module Wpclient
       connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
     end
 
+    def upload_file(filename, mime_type:)
+      path = filename.to_s
+      File.open(path, 'r') do |file|
+        upload(file, mime_type: mime_type, filename: File.basename(path))
+      end
+    end
+
     def inspect
       "#<Wpclient::Client #{connection.inspect}>"
     end

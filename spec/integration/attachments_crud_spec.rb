@@ -13,6 +13,15 @@ describe "Attachments" do
     expect(client.find_media(media.id)).to be_instance_of(Wpclient::Media)
   end
 
+  it "can be created from a file on disk" do
+    path = fixture_path("thoughtful.jpg")
+    media = client.upload_file(path, mime_type: "image/jpeg")
+
+    expect(media).to be_instance_of(Wpclient::Media)
+
+    expect(client.find_media(media.id)).to be_instance_of(Wpclient::Media)
+  end
+
   it "can be updated" do
     media = find_or_create_attachment
     updated = client.update_media(media.id, title: "Totally updated media")
