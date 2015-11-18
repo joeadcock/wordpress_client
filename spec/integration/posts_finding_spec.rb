@@ -25,6 +25,42 @@ describe "Posts (finding)" do
     expect(client.posts(category_slug: "filtering").map(&:id)).to eq [post.id]
   end
 
+  it "can list articles in a specific tag" do
+    tag = client.create_tag(name: "Taggged", slug: "tagged")
+    post = client.create_post(
+      tag_ids: [tag.id],
+      status: "publish",
+      title: "Some title",
+    )
+
+    expect(client.posts(tag_slug: "tagged").map(&:id)).to eq [post.id]
+  end
+
+  it "can list articles in a specific tag and category" do
+    category = client.create_category(name: "Fishing", slug: "fish")
+    tag = client.create_tag(name: "Soup", slug: "soup")
+    post = client.create_post(
+      category_ids: [category.id],
+      tag_ids: [tag.id],
+      status: "publish",
+      title: "Some title",
+    )
+
+    _post_without_tag = client.create_post(
+      category_ids: [category.id],
+      status: "publish",
+      title: "Some title",
+    )
+
+    _post_without_category = client.create_post(
+      tag_ids: [tag.id],
+      status: "publish",
+      title: "Some title",
+    )
+
+    expect(client.posts(category_slug: "fish", tag_slug: "soup").map(&:id)).to eq [post.id]
+  end
+
   describe "finding by slug" do
     it "finds the matching post" do
       post = client.create_post(title: "Oh hai", slug: "oh-hai")

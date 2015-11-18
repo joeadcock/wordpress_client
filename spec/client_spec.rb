@@ -28,6 +28,22 @@ describe Wpclient::Client do
 
       expect(client.posts(category_slug: "my-cat")).to eq []
     end
+
+    it "can filter on tag slugs" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(filter: {tag: "my-cat"})
+      ).and_return []
+
+      expect(client.posts(tag_slug: "my-cat")).to eq []
+    end
+
+    it "can filter on tag and category slugs" do
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Post, "posts", hash_including(filter: {tag: "my-cat", category_name: "my-dog"})
+      ).and_return []
+
+      expect(client.posts(tag_slug: "my-cat", category_slug: "my-dog")).to eq []
+    end
   end
 
   describe "fetching a single post" do

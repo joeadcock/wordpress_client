@@ -7,9 +7,10 @@ module Wpclient
       @connection = connection
     end
 
-    def posts(per_page: 10, page: 1, category_slug: nil)
+    def posts(per_page: 10, page: 1, category_slug: nil, tag_slug: nil)
       filter = {}
       filter[:category_name] = category_slug if category_slug
+      filter[:tag] = tag_slug if tag_slug
       connection.get_multiple(
         Post, "posts", per_page: per_page, page: page, _embed: nil, filter: filter
       )
