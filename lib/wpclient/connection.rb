@@ -60,6 +60,17 @@ module Wpclient
       true
     end
 
+    def upload(model, path, io, mime_type:)
+      response = post_data(path, io.read, mime_type)
+
+      if response.status == 201 # Created
+        model.parse(get_json(response.headers.fetch("location")))
+      else
+        handle_status_code(response)
+        model.parse(parse_json_response(response))
+      end
+    end
+
     def inspect
       "#<#{self.class.name} #@username @ #@url>"
     end
@@ -107,6 +118,16 @@ module Wpclient
         request.url path
         request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
         request.body = json
+      end
+    rescue Faraday::TimeoutError
+      raise TimeoutError
+    end
+
+    def post_data(path, data, content_type)
+      net.post do |request|
+        request.url path
+        request.headers["Content-Type"] = content_type
+        request.body = data
       end
     rescue Faraday::TimeoutError
       raise TimeoutError

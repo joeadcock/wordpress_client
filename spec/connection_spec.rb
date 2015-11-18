@@ -193,6 +193,30 @@ module Wpclient
       end
     end
 
+    describe "uploading" do
+      it "posts the given IO and returns the resulting model" do
+        stub_request(:post, "#{base_url}/files").with(
+          headers: {"content-type" => "text/plain"},
+          body: "hello world",
+        ).to_return(
+          status: 201, # Created
+          headers: {"Location" => "#{base_url}/files/hello"}
+        )
+        stub_get("#{base_url}/files/hello", returns: ["file info"])
+
+        model_instance = double("some model instance")
+        model = double("some model")
+
+        expect(model).to receive(:parse).with(["file info"]).and_return model_instance
+
+        result = connection.upload(
+          model, "files", StringIO.new("hello world"), mime_type: "text/plain"
+        )
+
+        expect(result).to eq model_instance
+      end
+    end
+
     def stub_get(
       path,
       returns: {},
