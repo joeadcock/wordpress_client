@@ -23,7 +23,6 @@ describe "Attachments" do
   end
 
   it "can be listed" do
-    pending
     find_or_create_attachment
 
     media = client.media(per_page: 1)

@@ -13,6 +13,18 @@ module Wpclient
       )
     end
 
+    def categories(per_page: 10, page: 1)
+      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
+    end
+
+    def tags(per_page: 10, page: 1)
+      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+    end
+
+    def media(per_page: 10, page: 1)
+      connection.get_multiple(Media, "media", page: page, per_page: per_page)
+    end
+
     def find_post(id)
       connection.get(Post, "posts/#{id.to_i}", _embed: nil)
     end
@@ -26,14 +38,6 @@ module Wpclient
       else
         raise NotFoundError, "Could not find post with slug #{slug.to_s.inspect}"
       end
-    end
-
-    def categories(per_page: 10, page: 1)
-      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
-    end
-
-    def tags(per_page: 10, page: 1)
-      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
     end
 
     def find_category(id)

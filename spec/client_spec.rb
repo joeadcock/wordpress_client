@@ -339,5 +339,15 @@ describe Wpclient::Client do
 
       expect(client.find_media(7)).to eq media
     end
+
+    it "can be listed" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Media, "media", per_page: 10, page: 1
+      ).and_return([media])
+
+      expect(client.media).to eq [media]
+    end
   end
 end
