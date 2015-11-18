@@ -10,7 +10,6 @@ describe "Attachments" do
 
     expect(media).to be_instance_of(Wpclient::Media)
 
-    pending
     expect(client.find_media(media.id)).to be_instance_of(Wpclient::Media)
   end
 

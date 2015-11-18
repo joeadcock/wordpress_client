@@ -320,8 +320,8 @@ describe Wpclient::Client do
     end
   end
 
-  describe "uploading files" do
-    it "uploads them as media" do
+  describe "media" do
+    it "can be uploaded from IO objects" do
       media = instance_double(Wpclient::Media)
       io = double("io")
 
@@ -330,6 +330,14 @@ describe Wpclient::Client do
       ).and_return media
 
       expect(client.upload_file(io, mime_type: "text/plain", filename: "foo.txt")).to eq media
+    end
+
+    it "can be found" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:get).with(Wpclient::Media, "media/7").and_return(media)
+
+      expect(client.find_media(7)).to eq media
     end
   end
 end

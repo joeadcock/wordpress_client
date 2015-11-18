@@ -44,6 +44,10 @@ module Wpclient
       connection.get(Tag, "terms/tag/#{id.to_i}")
     end
 
+    def find_media(id)
+      connection.get(Media, "media/#{id.to_i}")
+    end
+
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
