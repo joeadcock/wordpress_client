@@ -4,8 +4,8 @@ describe "Attachments" do
   setup_integration_client
 
   it "can be created" do
-    media = open_fixture("thoughtful.jpg") do |file|
-      client.upload_file(file, mime_type: "image/jpeg", filename: "thoughtful.jpg")
+    media = open_fixture("thoughtful.jpg") do |io|
+      client.upload(io, mime_type: "image/jpeg", filename: "thoughtful.jpg")
     end
 
     expect(media).to be_instance_of(Wpclient::Media)
@@ -29,8 +29,8 @@ describe "Attachments" do
   end
 
   def find_or_create_attachment
-    client.media(per_page: 1).first || open_fixture("thoughtful.jpg") do |file|
-      client.upload_file(file, mime_type: "image/jpeg", filename: "thoughtful.jpg")
+    client.media(per_page: 1).first || open_fixture("thoughtful.jpg") do |io|
+      client.upload(io, mime_type: "image/jpeg", filename: "thoughtful.jpg")
     end
   end
 end

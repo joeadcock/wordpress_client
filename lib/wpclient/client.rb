@@ -102,7 +102,7 @@ module Wpclient
       connection.patch(Media, "media/#{id.to_i}", attributes)
     end
 
-    def upload_file(io, mime_type:, filename:)
+    def upload(io, mime_type:, filename:)
       connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
     end
 
