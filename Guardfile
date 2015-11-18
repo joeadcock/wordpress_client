@@ -16,6 +16,13 @@ guard :rspec, rspec_options do
   watch(rspec.spec_support) { rspec.spec_dir }
   watch(rspec.spec_files)
 
+  watch("spec/shared_examples/term_examples.rb") do
+    [
+      "spec/category_spec.rb",
+      "spec/tag_spec.rb",
+    ]
+  end
+
   # Ruby files
   watch("lib/wpclient.rb") { rspec.spec_dir }
   dsl.watch_spec_files_for(%r{^lib/wpclient/(.*)\.rb$})

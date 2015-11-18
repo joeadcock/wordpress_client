@@ -39,6 +39,18 @@ describe Wpclient::Post do
     expect(post.category_ids).to eq [1]
   end
 
+  it "parses tags" do
+    post = Wpclient::Post.parse(fixture)
+
+    expect(post.tags).to eq [
+      Wpclient::Tag.new(
+        id: 2, name: "Foo", slug: "foo"
+      )
+    ]
+
+    expect(post.tag_ids).to eq [2]
+  end
+
   describe "dates" do
     it "uses GMT times if available" do
       post = Wpclient::Post.parse(fixture.merge(

@@ -16,6 +16,7 @@ module Wpclient
       assign_basic(post)
       assign_rendered(post)
       assign_categories(post)
+      assign_tags(post)
 
       post
     end
@@ -41,6 +42,12 @@ module Wpclient
     def assign_categories(post)
       post.categories = embedded_terms("category").map do |category|
         Category.parse(category)
+      end
+    end
+
+    def assign_tags(post)
+      post.tags = embedded_terms("post_tag").map do |tag|
+        Tag.parse(tag)
       end
     end
 
