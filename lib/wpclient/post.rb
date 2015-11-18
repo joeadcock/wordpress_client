@@ -23,6 +23,7 @@ module Wpclient
       updated_at: nil,
       date: nil,
       categories: [],
+      tags: [],
       meta: {},
       meta_ids: {}
     )
@@ -35,6 +36,7 @@ module Wpclient
       @updated_at = updated_at
       @date = date
       @categories = categories
+      @tags = tags
       @meta = meta
       @meta_ids = meta_ids
     end
