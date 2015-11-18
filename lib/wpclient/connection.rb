@@ -61,7 +61,9 @@ module Wpclient
     end
 
     def upload(model, path, io, mime_type:, filename:)
-      response = post_data(path, io.read, {
+      body = io.read
+      response = post_data(path, body, {
+        "Content-Length" => body.size.to_s,
         "Content-Type" => mime_type,
         # WP API does not parse normal Content-Disposition and instead ops to using their own format
         # https://github.com/WP-API/WP-API/issues/1744

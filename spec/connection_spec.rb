@@ -197,8 +197,10 @@ module Wpclient
       it "posts the given IO and returns the resulting model" do
         stub_request(:post, "#{base_url}/files").with(
           headers: {
+            "content-length" => "11",
             "content-type" => "text/plain",
-            # WP API does not parse normal Content-Disposition and instead ops to using their own format
+            # WP API does not parse normal Content-Disposition and instead ops
+            # to using their own format:
             # https://github.com/WP-API/WP-API/issues/1744
             "content-disposition" => 'filename=foo.txt',
           },
