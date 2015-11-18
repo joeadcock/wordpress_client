@@ -196,7 +196,12 @@ module Wpclient
     describe "uploading" do
       it "posts the given IO and returns the resulting model" do
         stub_request(:post, "#{base_url}/files").with(
-          headers: {"content-type" => "text/plain"},
+          headers: {
+            "content-type" => "text/plain",
+            # WP API does not parse normal Content-Disposition and instead ops to using their own format
+            # https://github.com/WP-API/WP-API/issues/1744
+            "content-disposition" => 'filename=foo.txt',
+          },
           body: "hello world",
         ).to_return(
           status: 201, # Created
@@ -210,7 +215,7 @@ module Wpclient
         expect(model).to receive(:parse).with(["file info"]).and_return model_instance
 
         result = connection.upload(
-          model, "files", StringIO.new("hello world"), mime_type: "text/plain"
+          model, "files", StringIO.new("hello world"), mime_type: "text/plain", filename: "foo.txt"
         )
 
         expect(result).to eq model_instance

@@ -113,10 +113,10 @@ describe Wpclient::Client do
       io = double("io")
 
       expect(connection).to receive(:upload).with(
-        Wpclient::Media, "media", io, mime_type: "text/plain"
+        Wpclient::Media, "media", io, mime_type: "text/plain", filename: "foo.txt"
       ).and_return media
 
-      expect(client.upload_file(io, mime_type: "text/plain")).to eq media
+      expect(client.upload_file(io, mime_type: "text/plain", filename: "foo.txt")).to eq media
     end
   end
 end

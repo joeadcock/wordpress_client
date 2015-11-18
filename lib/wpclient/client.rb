@@ -65,8 +65,8 @@ module Wpclient
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
-    def upload_file(io, mime_type:)
-      connection.upload(Media, "media", io, mime_type: mime_type)
+    def upload_file(io, mime_type:, filename:)
+      connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
     end
 
     def inspect
