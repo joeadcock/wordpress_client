@@ -98,6 +98,10 @@ module Wpclient
       connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
     end
 
+    def update_media(id, attributes)
+      connection.patch(Media, "media/#{id.to_i}", attributes)
+    end
+
     def upload_file(io, mime_type:, filename:)
       connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
     end

@@ -349,5 +349,15 @@ describe Wpclient::Client do
 
       expect(client.media).to eq [media]
     end
+
+    it "can be updated" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Media, "media/7", title: "New"
+      ).and_return(media)
+
+      expect(client.update_media(7, title: "New")).to eq media
+    end
   end
 end

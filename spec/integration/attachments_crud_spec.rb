@@ -14,12 +14,9 @@ describe "Attachments" do
   end
 
   it "can be updated" do
-    pending
     media = find_or_create_attachment
-
-    updated = client.update_media(media.id, title: "#{media.title} 2")
-
-    expect(updated.title).to eq "#{media.title} 2"
+    updated = client.update_media(media.id, title: "Totally updated media")
+    expect(updated.title).to eq "Totally updated media"
   end
 
   it "can be listed" do
