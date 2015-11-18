@@ -65,6 +65,10 @@ module Wpclient
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
 
+    def upload_file(io, mime_type:)
+      connection.upload(Media, "media", io, mime_type: mime_type)
+    end
+
     def inspect
       "#<Wpclient::Client #{connection.inspect}>"
     end

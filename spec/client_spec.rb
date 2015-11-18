@@ -106,4 +106,17 @@ describe Wpclient::Client do
     it "can be updated"
     it "can be deleted"
   end
+
+  describe "uploading files" do
+    it "uploads them as media" do
+      media = instance_double(Wpclient::Media)
+      io = double("io")
+
+      expect(connection).to receive(:upload).with(
+        Wpclient::Media, "media", io, mime_type: "text/plain"
+      ).and_return media
+
+      expect(client.upload_file(io, mime_type: "text/plain")).to eq media
+    end
+  end
 end
