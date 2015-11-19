@@ -1,6 +1,3 @@
-require "faraday"
-require "json"
-
 module Wpclient
   class Client
     def initialize(connection)
@@ -14,6 +11,18 @@ module Wpclient
       connection.get_multiple(
         Post, "posts", per_page: per_page, page: page, _embed: nil, filter: filter
       )
+    end
+
+    def categories(per_page: 10, page: 1)
+      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
+    end
+
+    def tags(per_page: 10, page: 1)
+      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+    end
+
+    def media(per_page: 10, page: 1)
+      connection.get_multiple(Media, "media", page: page, per_page: per_page)
     end
 
     def find_post(id)
@@ -31,20 +40,16 @@ module Wpclient
       end
     end
 
-    def categories(per_page: 10, page: 1)
-      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
-    end
-
-    def tags(per_page: 10, page: 1)
-      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
-    end
-
     def find_category(id)
       connection.get(Category, "terms/category/#{id.to_i}")
     end
 
     def find_tag(id)
       connection.get(Tag, "terms/tag/#{id.to_i}")
+    end
+
+    def find_media(id)
+      connection.get(Media, "media/#{id.to_i}")
     end
 
     def create_post(attributes)
@@ -91,6 +96,21 @@ module Wpclient
 
     def update_tag(id, attributes)
       connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
+    end
+
+    def update_media(id, attributes)
+      connection.patch(Media, "media/#{id.to_i}", attributes)
+    end
+
+    def upload(io, mime_type:, filename:)
+      connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
+    end
+
+    def upload_file(filename, mime_type:)
+      path = filename.to_s
+      File.open(path, 'r') do |file|
+        upload(file, mime_type: mime_type, filename: File.basename(path))
+      end
     end
 
     def inspect

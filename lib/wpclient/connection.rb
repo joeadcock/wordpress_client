@@ -1,3 +1,6 @@
+require "faraday"
+require "json"
+
 module Wpclient
   class Connection
     attr_reader :url, :username
@@ -57,6 +60,24 @@ module Wpclient
       true
     end
 
+    def upload(model, path, io, mime_type:, filename:)
+      body = io.read
+      response = post_data(path, body, {
+        "Content-Length" => body.size.to_s,
+        "Content-Type" => mime_type,
+        # WP API does not parse normal Content-Disposition and instead ops to using their own format
+        # https://github.com/WP-API/WP-API/issues/1744
+        "Content-Disposition" => "filename=#{filename || "unnamed"}",
+      })
+
+      if response.status == 201 # Created
+        model.parse(get_json(response.headers.fetch("location")))
+      else
+        handle_status_code(response)
+        model.parse(parse_json_response(response))
+      end
+    end
+
     def inspect
       "#<#{self.class.name} #@username @ #@url>"
     end
@@ -104,6 +125,16 @@ module Wpclient
         request.url path
         request.headers["Content-Type"] = "application/json; charset=#{json.encoding}"
         request.body = json
+      end
+    rescue Faraday::TimeoutError
+      raise TimeoutError
+    end
+
+    def post_data(path, data, headers)
+      net.post do |request|
+        request.url path
+        request.headers = headers
+        request.body = data
       end
     rescue Faraday::TimeoutError
       raise TimeoutError

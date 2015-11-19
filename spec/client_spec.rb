@@ -1,4 +1,5 @@
 require "spec_helper"
+require "tmpdir"
 
 describe Wpclient::Client do
   subject(:client) { Wpclient::Client.new(connection) }
@@ -317,6 +318,66 @@ describe Wpclient::Client do
       ).and_return tag
 
       expect(client.update_tag(45, name: "New")).to eq tag
+    end
+  end
+
+  describe "media" do
+    it "can be uploaded from IO objects" do
+      media = instance_double(Wpclient::Media)
+      io = double("io")
+
+      expect(connection).to receive(:upload).with(
+        Wpclient::Media, "media", io, mime_type: "text/plain", filename: "foo.txt"
+      ).and_return media
+
+      expect(client.upload(io, mime_type: "text/plain", filename: "foo.txt")).to eq media
+    end
+
+    it "can be uploaded from files" do
+      media = instance_double(Wpclient::Media)
+
+      Dir.mktmpdir do |dir|
+        file = File.join(dir, "test.txt")
+        File.write(file, "hello world")
+
+        expect(connection).to receive(:upload) do |_, _, io, filename:, mime_type:|
+          expect(filename).to eq "test.txt"
+          expect(mime_type).to eq "text/plain"
+
+          expect(io.read).to eq "hello world"
+          media
+        end
+
+        expect(client.upload_file(file, mime_type: "text/plain")).to eq media
+      end
+    end
+
+    it "can be found" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:get).with(Wpclient::Media, "media/7").and_return(media)
+
+      expect(client.find_media(7)).to eq media
+    end
+
+    it "can be listed" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:get_multiple).with(
+        Wpclient::Media, "media", per_page: 10, page: 1
+      ).and_return([media])
+
+      expect(client.media).to eq [media]
+    end
+
+    it "can be updated" do
+      media = instance_double(Wpclient::Media)
+
+      expect(connection).to receive(:patch).with(
+        Wpclient::Media, "media/7", title: "New"
+      ).and_return(media)
+
+      expect(client.update_media(7, title: "New")).to eq media
     end
   end
 end
