@@ -1,6 +1,7 @@
 require "wpclient/version"
 require "wpclient/errors"
 
+require "wpclient/rest_parser"
 require "wpclient/connection"
 require "wpclient/client"
 require "wpclient/paginated_collection"

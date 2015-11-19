@@ -1,5 +1,7 @@
 module Wpclient
   class PostParser
+    include RestParser
+
     def self.parse(data)
       new(data).to_post
     end
@@ -48,19 +50,6 @@ module Wpclient
     def assign_tags(post)
       post.tags = embedded_terms("post_tag").map do |tag|
         Tag.parse(tag)
-      end
-    end
-
-    def rendered(name)
-      (data[name] || {})["rendered"]
-    end
-
-    def read_date(name)
-      # Try to read UTC time first
-      if (gmt_time = data["#{name}_gmt"])
-        Time.iso8601("#{gmt_time}Z")
-      elsif (local_time = data[name])
-        Time.iso8601(local_time)
       end
     end
 
