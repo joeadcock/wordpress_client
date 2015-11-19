@@ -1,25 +1,14 @@
+require "delegate"
+
 module Wpclient
-  class PaginatedCollection
-    include Enumerable
+  class PaginatedCollection < DelegateClass(Array)
     attr_reader :total, :current_page, :per_page
 
     def initialize(entries, total:, current_page:, per_page:)
-      @entries = entries
+      super(entries)
       @total = total
       @current_page = current_page
       @per_page = per_page
-    end
-
-    def each
-      if block_given?
-        @entries.each { |e| yield e }
-      else
-        @entries.each
-      end
-    end
-
-    def replace(new_list)
-      @entries.replace(new_list)
     end
 
     #
@@ -60,36 +49,5 @@ module Wpclient
         0
       end
     end
-
-    #
-    # Array-like behavior
-    #
-
-    def size
-      @entries.size
-    end
-
-    def empty?
-      @entries.empty?
-    end
-
-    def to_a
-      @entries
-    end
-
-    def [](*args)
-      @entries[*args]
-    end
-
-    def first
-      @entries.first
-    end
-
-    def last
-      @entries.last
-    end
-
-    # Allow PaginatedCollection to be coerced into an array
-    alias to_ary to_a
   end
 end
