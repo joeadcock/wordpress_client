@@ -207,14 +207,14 @@ module Wpclient
           body: "hello world",
         ).to_return(
           status: 201, # Created
-          headers: {"Location" => "#{base_url}/files/hello"}
+          headers: {"Location" => "#{base_url}/files/67"}
         )
-        stub_get("#{base_url}/files/hello", returns: ["file info"])
+        stub_get("#{base_url}/files/67", returns: {id: 67})
 
         model_instance = double("some model instance")
         model = double("some model")
 
-        expect(model).to receive(:parse).with(["file info"]).and_return model_instance
+        expect(model).to receive(:parse).with("id" => 67).and_return model_instance
 
         result = connection.upload(
           model, "files", StringIO.new("hello world"), mime_type: "text/plain", filename: "foo.txt"
