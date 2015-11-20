@@ -64,6 +64,19 @@ describe "Posts (CRUD)" do
     }.to raise_error(Wpclient::NotFoundError)
   end
 
+  it "correctly handles HTML" do
+    post = client.create_post(
+      title: "HTML test",
+      content: '<p class="hello-world">Hello world</p>',
+    )
+
+    expect(post.content_html.strip).to eq '<p class="hello-world">Hello world</p>'
+
+    expect(
+      client.find_post(post.id).content_html.strip
+    ).to eq '<p class="hello-world">Hello world</p>'
+  end
+
   def find_existing_post
     posts = client.posts(per_page: 1)
     expect(posts).to_not be_empty
