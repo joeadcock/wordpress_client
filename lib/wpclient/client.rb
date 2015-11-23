@@ -113,6 +113,10 @@ module Wpclient
       end
     end
 
+    def delete_post(id, force: false)
+      connection.delete("posts/#{id.to_i}", {"force" => force})
+    end
+
     def inspect
       "#<Wpclient::Client #{connection.inspect}>"
     end

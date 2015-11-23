@@ -77,6 +77,46 @@ describe "Posts (CRUD)" do
     ).to eq '<p class="hello-world">Hello world</p>'
   end
 
+  it "can move a post to the trash can" do
+    post = find_existing_post
+
+    expect(
+      client.delete_post(post.id)
+    ).to eq true
+
+    # Post is in the trash can but still exists
+    # The status of a post is not exposed via the API so this behavior can not
+    # clearly be shown via the test
+    # https://github.com/WP-API/WP-API/issues/1760
+    expect(
+      client.find_post(post.id).id
+    ).to eq post.id
+  end
+
+  it "can permanently delete a post" do
+    post = find_existing_post
+
+    expect(
+      client.delete_post(post.id, force: true)
+    ).to eq true
+
+    expect {
+      client.find_post(post.id)
+    }.to raise_error(Wpclient::NotFoundError)
+  end
+
+  it "raises an error when deleting a post that does not exist" do
+    post_id = 99999999
+
+    expect {
+      client.find_post(post_id)
+    }.to raise_error(Wpclient::NotFoundError)
+
+    expect {
+      client.delete_post(99999999)
+    }.to raise_error(Wpclient::NotFoundError)
+  end
+
   def find_existing_post
     posts = client.posts(per_page: 1)
     expect(posts).to_not be_empty
