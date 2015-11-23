@@ -77,6 +77,30 @@ describe "Posts (CRUD)" do
     ).to eq '<p class="hello-world">Hello world</p>'
   end
 
+  it "can delete posts" do
+    post = find_existing_post
+
+    expect(
+      client.delete_post(post.id)
+    ).to eq true
+
+    expect {
+      client.find_post(post.id)
+    }.to raise_error(Wpclient::NotFoundError)
+  end
+
+  it "raises an error when deleting a post that does not exist" do
+    post_id = 99999999
+
+    expect {
+      client.find_post(post_id)
+    }.to raise_error(Wpclient::NotFoundError)
+
+    expect {
+      client.delete_post(99999999)
+    }.to raise_error(Wpclient::NotFoundError)
+  end
+
   def find_existing_post
     posts = client.posts(per_page: 1)
     expect(posts).to_not be_empty

@@ -233,6 +233,16 @@ describe Wpclient::Client do
     end
   end
 
+  describe "deleting posts" do
+    it "requests that the client delete a post" do
+      expect(connection).to receive(:delete).with(
+        "posts/1", {"force" => true}
+      ).and_return true
+
+      expect(client.delete_post(1)).to eq true
+    end
+  end
+
   describe "categories" do
     it "can be listed" do
       expect(connection).to receive(:get_multiple).with(
