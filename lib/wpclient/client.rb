@@ -114,11 +114,7 @@ module Wpclient
     end
 
     def delete_post(id, force: false)
-      attrs = {}
-      if force
-        attrs["force"] = true
-      end
-      connection.delete("posts/#{id.to_i}", attrs)
+      connection.delete("posts/#{id.to_i}", {"force" => force})
     end
 
     def inspect
