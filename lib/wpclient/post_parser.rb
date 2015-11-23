@@ -30,6 +30,7 @@ module Wpclient
       post.id = data["id"]
       post.slug = data["slug"]
       post.url = data["link"]
+      post.status = data["status"]
       post.updated_at = read_date("modified")
       post.date = read_date("date")
     end

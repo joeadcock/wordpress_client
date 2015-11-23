@@ -84,13 +84,9 @@ describe "Posts (CRUD)" do
       client.delete_post(post.id)
     ).to eq true
 
-    # Post is in the trash can but still exists
-    # The status of a post is not exposed via the API so this behavior can not
-    # clearly be shown via the test
-    # https://github.com/WP-API/WP-API/issues/1760
-    expect(
-      client.find_post(post.id).id
-    ).to eq post.id
+    found_post = client.find_post(post.id)
+    expect(found_post.id).to eq post.id
+    expect(found_post.status).to eq "trash"
   end
 
   it "can permanently delete a post" do
