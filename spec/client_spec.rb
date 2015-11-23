@@ -52,7 +52,7 @@ describe Wpclient::Client do
       post = instance_double(Wpclient::Post)
 
       expect(connection).to receive(:get).with(
-        Wpclient::Post, "posts/5", _embed: nil
+        Wpclient::Post, "posts/5", _embed: nil, context: "edit"
       ).and_return post
 
       expect(client.find_post(5)).to eq post

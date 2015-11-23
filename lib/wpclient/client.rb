@@ -9,7 +9,7 @@ module Wpclient
       filter[:category_name] = category_slug if category_slug
       filter[:tag] = tag_slug if tag_slug
       connection.get_multiple(
-        Post, "posts", per_page: per_page, page: page, _embed: nil, filter: filter
+        Post, "posts", per_page: per_page, page: page, _embed: nil, context: "edit", filter: filter
       )
     end
 
@@ -26,7 +26,7 @@ module Wpclient
     end
 
     def find_post(id)
-      connection.get(Post, "posts/#{id.to_i}", _embed: nil)
+      connection.get(Post, "posts/#{id.to_i}", _embed: nil, context: "edit")
     end
 
     def find_by_slug(slug)
