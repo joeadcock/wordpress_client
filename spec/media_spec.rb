@@ -13,6 +13,7 @@ module Wpclient
       expect(media.description).to eq ""
 
       expect(media.guid).to eq "http://example.com/wp-content/uploads/2015/11/thoughtful.jpg"
+      expect(media.source_url).to eq "http://example.com/wp-content/uploads/2015/11/thoughtful.jpg"
       expect(media.link).to eq "http://example.com/?attachment_id=5"
 
       expect(media.date).to_not be_nil
@@ -21,6 +22,16 @@ module Wpclient
 
     it "exposes media information" do
       expect(Media.parse(fixture).media_details).to eq fixture.fetch("media_details")
+    end
+
+    it "tries to read guid from source_url if guid is not present" do
+      # This happens for associated attachments of posts, for example.
+      fixture.delete("guid")
+      fixture["source_url"] = "http://example.com/image.jpg"
+
+      media = Media.parse(fixture)
+      expect(media.guid).to eq "http://example.com/image.jpg"
+      expect(media.source_url).to eq "http://example.com/image.jpg"
     end
 
     describe "dates" do

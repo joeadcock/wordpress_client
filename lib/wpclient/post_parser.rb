@@ -19,6 +19,7 @@ module Wpclient
       assign_rendered(post)
       assign_categories(post)
       assign_tags(post)
+      assign_featured_image(post)
 
       post
     end
@@ -50,6 +51,17 @@ module Wpclient
     def assign_tags(post)
       post.tags = embedded_terms("post_tag").map do |tag|
         Tag.parse(tag)
+      end
+    end
+
+    def assign_featured_image(post)
+      featured_id = data["featured_image"]
+      if featured_id
+        attachments = (embedded["http://v2.wp-api.org/attachment"] || []).flatten
+        media = attachments.detect { |attachment| attachment["id"] == featured_id }
+        if media
+          post.featured_image = Media.parse(media)
+        end
       end
     end
 

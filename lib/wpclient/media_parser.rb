@@ -16,6 +16,7 @@ module Wpclient
       assign_basic(media)
       assign_dates(media)
       assign_rendered(media)
+      assign_guid(media)
 
       media
     end
@@ -27,8 +28,8 @@ module Wpclient
       media.id = data.fetch("id")
       media.slug = data.fetch("slug")
       media.link = data.fetch("link")
-      media.description = data.fetch("description")
-      media.media_details = data.fetch("media_details")
+      media.description = data["description"]
+      media.media_details = data["media_details"]
     end
 
     def assign_dates(media)
@@ -38,7 +39,10 @@ module Wpclient
 
     def assign_rendered(media)
       media.title = rendered("title")
-      media.guid = rendered("guid")
+    end
+
+    def assign_guid(media)
+      media.guid = rendered("guid") || data["source_url"]
     end
   end
 end
