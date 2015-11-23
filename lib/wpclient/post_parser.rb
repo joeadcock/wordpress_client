@@ -16,6 +16,7 @@ module Wpclient
       post = Post.new(meta: meta, meta_ids: meta_ids)
 
       assign_basic(post)
+      assign_dates(post)
       assign_rendered(post)
       assign_categories(post)
       assign_tags(post)
@@ -31,6 +32,9 @@ module Wpclient
       post.slug = data["slug"]
       post.url = data["link"]
       post.status = data["status"]
+    end
+
+    def assign_dates(post)
       post.updated_at = read_date("modified")
       post.date = read_date("date")
     end
