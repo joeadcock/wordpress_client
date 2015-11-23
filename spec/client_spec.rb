@@ -236,10 +236,26 @@ describe Wpclient::Client do
   describe "deleting posts" do
     it "requests that the client delete a post" do
       expect(connection).to receive(:delete).with(
-        "posts/1", {"force" => true}
+        "posts/1", {}
       ).and_return true
 
       expect(client.delete_post(1)).to eq true
+    end
+
+    it "requests that a client does not forcefully delete a post" do
+      expect(connection).to receive(:delete).with(
+        "posts/1", {}
+      ).and_return true
+
+      expect(client.delete_post(1, force: false)).to eq true
+    end
+
+    it "requests that a client forcefully deletes a post" do
+      expect(connection).to receive(:delete).with(
+        "posts/1", {"force" => true}
+      ).and_return true
+
+      expect(client.delete_post(1, force: true)).to eq true
     end
   end
 
