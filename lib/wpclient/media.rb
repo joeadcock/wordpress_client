@@ -31,5 +31,7 @@ module Wpclient
       @link = link
       @media_details = media_details
     end
+
+    alias source_url guid
   end
 end

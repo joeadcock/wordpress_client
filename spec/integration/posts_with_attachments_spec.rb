@@ -7,8 +7,10 @@ describe "Posts with attachments" do
     media = find_or_upload_media
     post = client.create_post(title: "With media", featured_image: media.id)
 
-    pending
-    expect(post.featured_image).to eq media
+    expect(post.featured_image).to be_instance_of(Wpclient::Media)
+    expect(post.featured_image.slug).to eq media.slug
+    expect(post.featured_image.guid).to eq media.guid
+    expect(post.featured_image.source_url).to eq media.source_url
     expect(post.featured_image_id).to eq media.id
   end
 

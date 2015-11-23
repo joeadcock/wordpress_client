@@ -51,6 +51,14 @@ describe Wpclient::Post do
     expect(post.tag_ids).to eq [2]
   end
 
+  it "can have a Media as featured image" do
+    media = instance_double(Wpclient::Media, id: 12)
+    post = Wpclient::Post.new(featured_image: media)
+
+    expect(post.featured_image).to eq media
+    expect(post.featured_image_id).to eq 12
+  end
+
   describe "dates" do
     it "uses GMT times if available" do
       post = Wpclient::Post.parse(fixture.merge(
