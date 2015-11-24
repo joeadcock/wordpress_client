@@ -1,18 +1,18 @@
 module Wpclient
   class Term
-    attr_reader :id, :name, :slug
+    attr_reader :id, :name_html, :slug
 
     def self.parse(data)
       new(
         id: data.fetch("id"),
-        name: data.fetch("name"),
+        name_html: data.fetch("name"),
         slug: data.fetch("slug"),
       )
     end
 
-    def initialize(id:, name:, slug:)
+    def initialize(id:, name_html:, slug:)
       @id = id
-      @name = name
+      @name_html = name_html
       @slug = slug
     end
 
@@ -20,7 +20,7 @@ module Wpclient
       if other.is_a? Term
         other.class == self.class &&
           other.id == id &&
-          other.name == name &&
+          other.name_html == name_html &&
           other.slug == slug
       else
         super
@@ -28,7 +28,7 @@ module Wpclient
     end
 
     def inspect
-      "#<#{self.class} ##{id} #{name.inspect} (#{slug})>"
+      "#<#{self.class} ##{id} #{name_html.inspect} (#{slug})>"
     end
   end
 end

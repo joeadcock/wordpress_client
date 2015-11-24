@@ -3,8 +3,8 @@ require "time"
 module Wpclient
   class Post
     attr_accessor(
-      :id, :title, :slug, :url, :guid, :status,
-      :excerpt_html, :content_html,
+      :id, :slug, :url, :guid, :status,
+      :title_html, :excerpt_html, :content_html,
       :updated_at, :date,
       :categories, :tags, :meta, :featured_image
     )
@@ -16,9 +16,9 @@ module Wpclient
     def initialize(
       id: nil,
       url: nil,
-      title: nil,
       guid: nil,
       status: "unknown",
+      title_html: nil,
       excerpt_html: nil,
       content_html: nil,
       updated_at: nil,
@@ -31,9 +31,9 @@ module Wpclient
     )
       @id = id
       @url = url
-      @title = title
       @guid = guid
       @status = status
+      @title_html = title_html
       @excerpt_html = excerpt_html
       @content_html = content_html
       @updated_at = updated_at

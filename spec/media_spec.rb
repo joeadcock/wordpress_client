@@ -8,7 +8,7 @@ module Wpclient
       media = Media.parse(fixture)
 
       expect(media.id).to eq 5
-      expect(media.title).to eq "thoughtful"
+      expect(media.title_html).to eq "thoughtful"
       expect(media.slug).to eq "thoughtful"
       expect(media.description).to eq ""
 

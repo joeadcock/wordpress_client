@@ -38,7 +38,7 @@ module Wpclient
     end
 
     def assign_rendered(media)
-      media.title = rendered("title")
+      media.title_html = rendered("title")
     end
 
     def assign_guid(media)

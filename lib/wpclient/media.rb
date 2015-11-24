@@ -1,7 +1,7 @@
 module Wpclient
   class Media
     attr_accessor(
-      :id, :slug, :title, :description,
+      :id, :slug, :title_html, :description,
       :date, :updated_at,
       :guid, :link, :media_details
     )
@@ -13,7 +13,7 @@ module Wpclient
     def initialize(
       id: nil,
       slug: nil,
-      title: nil,
+      title_html: nil,
       description: nil,
       date: nil,
       updated_at: nil,
@@ -23,7 +23,7 @@ module Wpclient
     )
       @id = id
       @slug = slug
-      @title = title
+      @title_html = title_html
       @date = date
       @updated_at = updated_at
       @description = description

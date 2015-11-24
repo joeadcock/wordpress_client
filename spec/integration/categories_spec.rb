@@ -10,7 +10,7 @@ describe "Categories" do
 
     category = post.categories.first
     expect(category.id).to be_kind_of(Integer)
-    expect(category.name).to be_instance_of(String)
+    expect(category.name_html).to be_instance_of(String)
     expect(category.slug).to be_instance_of(String)
 
     expect(post.category_ids).to eq post.categories.map(&:id)
@@ -22,7 +22,7 @@ describe "Categories" do
 
     category = categories.first
     expect(category.id).to be_kind_of(Integer)
-    expect(category.name).to be_instance_of(String)
+    expect(category.name_html).to be_instance_of(String)
     expect(category.slug).to be_instance_of(String)
   end
 
@@ -35,16 +35,21 @@ describe "Categories" do
     category = client.create_category(name: "New category")
 
     expect(category.id).to be_kind_of(Integer)
-    expect(category.name).to eq "New category"
+    expect(category.name_html).to eq "New category"
     expect(category.slug).to eq "new-category"
 
-    expect(client.categories(per_page: 100).map(&:name)).to include "New category"
+    expect(client.categories(per_page: 100).map(&:name_html)).to include "New category"
   end
 
   it "can be updated" do
     existing = find_existing_category
     client.update_category(existing.id, name: "Updated name")
-    expect(client.find_category(existing.id).name).to eq "Updated name"
+    expect(client.find_category(existing.id).name_html).to eq "Updated name"
+  end
+
+  it "uses HTML for the name" do
+    category = client.create_category(name: "Sort & Find")
+    expect(category.name_html).to eq "Sort &amp; Find"
   end
 
   def find_existing_category

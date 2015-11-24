@@ -41,8 +41,8 @@ module Wpclient
     end
 
     def assign_rendered(post)
-      post.title = rendered("title")
       post.guid = rendered("guid")
+      post.title_html = rendered("title")
       post.excerpt_html = rendered("excerpt")
       post.content_html = rendered("content")
     end

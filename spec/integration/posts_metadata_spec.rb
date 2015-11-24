@@ -19,4 +19,9 @@ describe "Post meta" do
     post = client.update_post(post.id, meta: {three: "3", two: nil})
     expect(post.meta).to eq("three" => "3")
   end
+
+  it "does not contain HTML data" do
+    post = client.create_post(title: "Metadata HTML", meta: {foo: "bar&baz"})
+    expect(post.meta).to eq("foo" => "bar&baz")
+  end
 end
