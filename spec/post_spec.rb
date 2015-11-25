@@ -7,7 +7,7 @@ describe Wpclient::Post do
     post = Wpclient::Post.parse(fixture)
 
     expect(post.id).to eq 1
-    expect(post.title).to eq "Hello world!"
+    expect(post.title_html).to eq "Hello world!"
     expect(post.slug).to eq "hello-world"
 
     expect(post.url).to eq "http://example.com/2015/11/03/hello-world/"
@@ -32,7 +32,7 @@ describe Wpclient::Post do
 
     expect(post.categories).to eq [
       Wpclient::Category.new(
-        id: 1, name: "Uncategorized", slug: "uncategorized"
+        id: 1, name_html: "Uncategorized", slug: "uncategorized"
       )
     ]
 
@@ -44,7 +44,7 @@ describe Wpclient::Post do
 
     expect(post.tags).to eq [
       Wpclient::Tag.new(
-        id: 2, name: "Foo", slug: "foo"
+        id: 2, name_html: "Foo", slug: "foo"
       )
     ]
 

@@ -25,7 +25,7 @@ describe "Attachments" do
   it "can be updated" do
     media = find_or_create_attachment
     updated = client.update_media(media.id, title: "Totally updated media")
-    expect(updated.title).to eq "Totally updated media"
+    expect(updated.title_html).to eq "Totally updated media"
   end
 
   it "can be listed" do
@@ -35,6 +35,12 @@ describe "Attachments" do
 
     expect(media.size).to be > 0
     expect(media.first).to be_instance_of(Wpclient::Media)
+  end
+
+  it "uses HTML for the title" do
+    media = find_or_create_attachment
+    updated = client.update_media(media.id, title: "Images & paint")
+    expect(updated.title_html).to eq "Images &amp; paint"
   end
 
   def find_or_create_attachment

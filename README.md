@@ -26,6 +26,8 @@ data = {
 
 post = client.create_post(data) # => Wpclient::Post
 updated_post = client.update_post(post.id, title: "Updated") # => Wpclient::Post
+
+updated_post.title_html # => "Updated"
 ```
 
 ## Running tests

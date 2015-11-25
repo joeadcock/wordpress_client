@@ -9,7 +9,7 @@ describe "Posts (CRUD)" do
 
     post = posts.first
     expect(post).to be_instance_of Wpclient::Post
-    expect(post.title).to be_instance_of(String)
+    expect(post.title_html).to be_instance_of(String)
   end
 
   it "can get specific posts" do
@@ -17,7 +17,7 @@ describe "Posts (CRUD)" do
 
     found_post = client.find_post(existing_post.id)
     expect(found_post.id).to eq existing_post.id
-    expect(found_post.title).to eq existing_post.title
+    expect(found_post.title_html).to eq existing_post.title_html
 
     expect { client.find_post(888888) }.to raise_error(Wpclient::NotFoundError)
   end
@@ -35,7 +35,7 @@ describe "Posts (CRUD)" do
     # Try to find the post to determine if it was persisted or not
     all_posts = client.posts(per_page: 100)
     expect(all_posts.map(&:id)).to include post.id
-    expect(all_posts.map(&:title)).to include "A newly created post"
+    expect(all_posts.map(&:title_html)).to include "A newly created post"
   end
 
   it "raises a validation error if post could not be created" do
@@ -49,7 +49,7 @@ describe "Posts (CRUD)" do
 
     client.update_post(post.id, title: "Updated title")
 
-    expect(client.find_post(post.id).title).to eq "Updated title"
+    expect(client.find_post(post.id).title_html).to eq "Updated title"
   end
 
   it "raises errors if post could not be updated" do
@@ -66,15 +66,12 @@ describe "Posts (CRUD)" do
 
   it "correctly handles HTML" do
     post = client.create_post(
-      title: "HTML test",
+      title: "HTML test & verify",
       content: '<p class="hello-world">Hello world</p>',
     )
 
     expect(post.content_html.strip).to eq '<p class="hello-world">Hello world</p>'
-
-    expect(
-      client.find_post(post.id).content_html.strip
-    ).to eq '<p class="hello-world">Hello world</p>'
+    expect(post.title_html.strip).to eq 'HTML test &amp; verify'
   end
 
   it "can move a post to the trash can" do
