@@ -15,6 +15,7 @@ module Wpclient
 
     def initialize(
       id: nil,
+      slug: nil,
       url: nil,
       guid: nil,
       status: "unknown",
@@ -30,6 +31,7 @@ module Wpclient
       meta_ids: {}
     )
       @id = id
+      @slug = slug
       @url = url
       @guid = guid
       @status = status
