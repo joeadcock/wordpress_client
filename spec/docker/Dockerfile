@@ -26,7 +26,7 @@ RUN yum install -y tar
 
 # WP API
 # Get download link from https://wordpress.org/plugins/rest-api/
-RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-api.2.0-beta5.zip \
+RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-api.2.0-beta8.zip \
   && unzip /tmp/rest-api.zip -d /var/www/html/wordpress/wp-content/plugins/ \
   && rm /tmp/rest-api.zip
 
