@@ -86,12 +86,12 @@ module Wpclient
     end
 
     def embedded_terms(type)
-      term_collections = embedded["http://v2.wp-api.org/term"] || []
+      term_collections = embedded["https://api.w.org/term"] || []
 
       # term_collections is an array of arrays with terms in them. We can see
       # the type of the "collection" by inspecting the first child's taxonomy.
       term_collections.detect { |terms|
-        terms.size > 0 && terms.first["taxonomy"] == type
+        terms.size > 0 && terms.is_a?(Array) && terms.first["taxonomy"] == type
       } || []
     end
 
