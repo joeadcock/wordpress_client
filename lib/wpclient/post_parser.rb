@@ -62,8 +62,8 @@ module Wpclient
     def assign_featured_image(post)
       featured_id = data["featured_image"]
       if featured_id
-        attachments = (embedded["http://v2.wp-api.org/attachment"] || []).flatten
-        media = attachments.detect { |attachment| attachment["id"] == featured_id }
+        features = (embedded["https://api.w.org/featuredmedia"] || []).flatten
+        media = features.detect { |feature| feature["id"] == featured_id }
         if media
           post.featured_image = Media.parse(media)
         end
@@ -71,7 +71,7 @@ module Wpclient
     end
 
     def parse_metadata
-      embedded_metadata = (embedded["http://v2.wp-api.org/meta"] || []).flatten
+      embedded_metadata = (embedded["https://api.w.org/meta"] || []).flatten
       validate_embedded_metadata(embedded_metadata)
 
       meta = {}
@@ -86,12 +86,12 @@ module Wpclient
     end
 
     def embedded_terms(type)
-      term_collections = embedded["http://v2.wp-api.org/term"] || []
+      term_collections = embedded["https://api.w.org/term"] || []
 
       # term_collections is an array of arrays with terms in them. We can see
       # the type of the "collection" by inspecting the first child's taxonomy.
       term_collections.detect { |terms|
-        terms.size > 0 && terms.first["taxonomy"] == type
+        terms.size > 0 && terms.is_a?(Array) && terms.first["taxonomy"] == type
       } || []
     end
 

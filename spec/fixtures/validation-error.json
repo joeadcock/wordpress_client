@@ -1,1 +1,1 @@
-[{"code":"rest_invalid_param","message":"Invalid parameter(s): status (status is not one of publish, future, draft, pending, private)","data":{"status":400,"params":["status (status is not one of publish, future, draft, pending, private)"]}}]
+{"code":"rest_invalid_param","message":"Invalid parameter(s): status (status is not one of publish, future, draft, pending, private)","data":{"status":400,"params":["status (status is not one of publish, future, draft, pending, private)"]}}
