@@ -177,7 +177,7 @@ module Wpclient
     end
 
     def bad_request_details(response)
-      details = JSON.parse(response.body).first
+      details = JSON.parse(response.body)
       [details["code"], details["message"]]
     rescue
       [nil, "Bad Request"]
