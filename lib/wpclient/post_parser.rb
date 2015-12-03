@@ -62,8 +62,8 @@ module Wpclient
     def assign_featured_image(post)
       featured_id = data["featured_image"]
       if featured_id
-        attachments = (embedded["http://v2.wp-api.org/attachment"] || []).flatten
-        media = attachments.detect { |attachment| attachment["id"] == featured_id }
+        features = (embedded["https://api.w.org/featuredmedia"] || []).flatten
+        media = features.detect { |feature| feature["id"] == featured_id }
         if media
           post.featured_image = Media.parse(media)
         end
@@ -71,7 +71,7 @@ module Wpclient
     end
 
     def parse_metadata
-      embedded_metadata = (embedded["http://v2.wp-api.org/meta"] || []).flatten
+      embedded_metadata = (embedded["https://api.w.org/meta"] || []).flatten
       validate_embedded_metadata(embedded_metadata)
 
       meta = {}
