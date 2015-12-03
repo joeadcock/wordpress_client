@@ -1,1 +1,1 @@
-[{"code":"rest_post_invalid_id","message":"Post ID is invalid.","data":{"status":400}}]
+{"code":"rest_post_invalid_id","message":"Invalid post ID.","data":{"status":404}}
