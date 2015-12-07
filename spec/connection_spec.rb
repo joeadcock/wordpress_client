@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module Wpclient
+module WordpressClient
   describe Connection do
     subject(:connection) {
       Connection.new(url: "http://example.com/", username: "jane", password: "doe")
@@ -48,7 +48,7 @@ module Wpclient
         expect(collection.per_page).to eq 15
       end
 
-      it "raises Wpclient::TimeoutError when requests time out" do
+      it "raises WordpressClient::TimeoutError when requests time out" do
         stub_request(:get, /./).to_timeout
         expect { connection.get(model, "foo") }.to raise_error(TimeoutError)
         expect { connection.get_multiple(model, "foo") }.to raise_error(TimeoutError)

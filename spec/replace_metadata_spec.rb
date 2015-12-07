@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module Wpclient
+module WordpressClient
   describe ReplaceMetadata do
     it "does nothing if the new metadata is equal to the existing one" do
       post = instance_double(Post, id: 5, meta: {"existing" => "1"})

@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   Error = Class.new(::StandardError)
 
   UnauthorizedError = Class.new(Error)

@@ -1,6 +1,8 @@
-# wpclient
+# WordpressClient
 
-wpclient is a simple client to the Wordpress API.
+WordpressClient is a very simple client to the Wordpress API, version 2 beta 8.0.
+
+**NOTE:** The repository is still named `wpclient` as we're in the middle of a rename. Some references might persist until it's completed.
 
 [![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient) [![Code Climate](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/gpa.svg)](https://codeclimate.com/repos/5645938269568041da00cded/feed) [![Test Coverage](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/coverage.svg)](https://codeclimate.com/repos/5645938269568041da00cded/coverage)
 
@@ -9,9 +11,9 @@ wpclient is a simple client to the Wordpress API.
 Initialize a client with a username, password and API URL. You can then search for posts.
 
 ```ruby
-client = Wpclient.new(url: "https://example.com/wp-json/", username: "example", password: "example")
+client = WordpressClient.new(url: "https://example.com/wp-json/", username: "example", password: "example")
 
-client.posts(per_page: 5) # => [Wpclient::Post, Wpclient::Post]
+client.posts(per_page: 5) # => [WordpressClient::Post, WordpressClient::Post]
 ```
 
 ### Creating a post
@@ -24,8 +26,8 @@ data = {
   # ...
 }
 
-post = client.create_post(data) # => Wpclient::Post
-updated_post = client.update_post(post.id, title: "Updated") # => Wpclient::Post
+post = client.create_post(data) # => WordpressClient::Post
+updated_post = client.update_post(post.id, title: "Updated") # => WordpressClient::Post
 
 updated_post.title_html # => "Updated"
 ```

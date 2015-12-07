@@ -1,6 +1,6 @@
 require "time"
 
-module Wpclient
+module WordpressClient
   class Post
     attr_accessor(
       :id, :slug, :url, :guid, :status,

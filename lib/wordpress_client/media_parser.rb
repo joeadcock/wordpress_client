@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   class MediaParser
     include RestParser
 

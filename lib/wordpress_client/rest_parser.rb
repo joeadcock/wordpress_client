@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   module RestParser
     private
     def rendered(name)

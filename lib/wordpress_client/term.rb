@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   class Term
     attr_reader :id, :name_html, :slug
 

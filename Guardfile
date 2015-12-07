@@ -24,6 +24,6 @@ guard :rspec, rspec_options do
   end
 
   # Ruby files
-  watch("lib/wpclient.rb") { rspec.spec_dir }
-  dsl.watch_spec_files_for(%r{^lib/wpclient/(.*)\.rb$})
+  watch("lib/wordpress_client.rb") { rspec.spec_dir }
+  dsl.watch_spec_files_for(%r{^lib/wordpress_client/(.*)\.rb$})
 end

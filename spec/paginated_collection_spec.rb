@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module Wpclient
+module WordpressClient
   describe PaginatedCollection do
     it "wraps an array" do
       list = ["one"]

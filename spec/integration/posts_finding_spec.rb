@@ -71,7 +71,7 @@ describe "Posts (finding)" do
     it "raises NotFoundError when no post can be found" do
       expect {
         client.find_by_slug("clearly-does-not-exist-anywhere")
-      }.to raise_error(Wpclient::NotFoundError, /clearly/)
+      }.to raise_error(WordpressClient::NotFoundError, /clearly/)
     end
 
     it "finds on the slug even if the title is wildly different" do

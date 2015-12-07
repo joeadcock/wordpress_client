@@ -7,7 +7,7 @@ describe "Posts with attachments" do
     media = find_or_upload_media
     post = client.create_post(title: "With media", featured_image: media.id)
 
-    expect(post.featured_image).to be_instance_of(Wpclient::Media)
+    expect(post.featured_image).to be_instance_of(WordpressClient::Media)
     expect(post.featured_image.slug).to eq media.slug
     expect(post.featured_image.guid).to eq media.guid
     expect(post.featured_image.source_url).to eq media.source_url

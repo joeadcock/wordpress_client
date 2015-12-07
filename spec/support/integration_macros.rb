@@ -4,7 +4,7 @@ module IntegrationMacros
 
     let(:client) {
       server = WordpressServer.instance
-      Wpclient.new(url: server.url, username: server.username, password: server.password)
+      WordpressClient.new(url: server.url, username: server.username, password: server.password)
     }
   end
 end
