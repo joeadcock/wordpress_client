@@ -1,4 +1,4 @@
-shared_examples_for(Wpclient::Term) do |fixture_name:|
+shared_examples_for(WordpressClient::Term) do |fixture_name:|
   it "has an id, name_html and slug" do
     term = described_class.new(id: 5, name_html: "Heyho", slug: "heyho")
     expect(term.id).to eq 5
@@ -29,7 +29,7 @@ shared_examples_for(Wpclient::Term) do |fixture_name:|
   end
 
   it "it not equal on other Term subclasses with the same id, name_html and slug" do
-    other_subclass = Class.new(Wpclient::Tag)
+    other_subclass = Class.new(WordpressClient::Tag)
 
     term = described_class.new(id: 1, name_html: "One", slug: "one")
     expect(term).to_not eq other_subclass.new(id: 1, name_html: "One", slug: "one")

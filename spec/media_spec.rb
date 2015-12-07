@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module Wpclient
+module WordpressClient
   describe Media do
     let(:fixture) { json_fixture("image-media.json") }
 

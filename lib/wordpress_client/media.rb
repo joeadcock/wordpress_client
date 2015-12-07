@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   class Media
     attr_accessor(
       :id, :slug, :title_html, :description,

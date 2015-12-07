@@ -3,13 +3,14 @@ if ENV['CODECLIMATE_REPO_TOKEN']
   CodeClimate::TestReporter.start
 end
 
-$LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require "webmock/rspec"
-require "wpclient"
 
 require_relative "support/wordpress_server"
 require_relative "support/fixtures"
 require_relative "support/integration_macros"
+
+$LOAD_PATH << File.expand_path("../../lib", __FILE__)
+require "wordpress_client"
 
 RSpec.configure do |config|
   config.extend IntegrationMacros

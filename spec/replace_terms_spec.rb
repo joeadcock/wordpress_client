@@ -1,6 +1,6 @@
 require "spec_helper"
 
-module Wpclient
+module WordpressClient
   describe ReplaceTerms do
     it "adds missing categories" do
       connection = double(Connection)

@@ -1,4 +1,4 @@
-module Wpclient
+module WordpressClient
   class Client
     def initialize(connection)
       @connection = connection
@@ -118,7 +118,7 @@ module Wpclient
     end
 
     def inspect
-      "#<Wpclient::Client #{connection.inspect}>"
+      "#<WordpressClient::Client #{connection.inspect}>"
     end
 
     private

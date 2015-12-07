@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'wpclient/version'
+require 'wordpress_client/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "wpclient"
-  spec.version       = Wpclient::VERSION
+  spec.name          = "wordpress_client"
+  spec.version       = WordpressClient::VERSION
   spec.authors       = ["Magnus Bergmark"]
   spec.email         = ["magnus.bergmark@gmail.com"]
   spec.summary       = "A simple client to the Wordpress API."

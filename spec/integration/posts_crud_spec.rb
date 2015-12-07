@@ -8,7 +8,7 @@ describe "Posts (CRUD)" do
     expect(posts.size).to be 1
 
     post = posts.first
-    expect(post).to be_instance_of Wpclient::Post
+    expect(post).to be_instance_of WordpressClient::Post
     expect(post.title_html).to be_instance_of(String)
   end
 
@@ -19,7 +19,7 @@ describe "Posts (CRUD)" do
     expect(found_post.id).to eq existing_post.id
     expect(found_post.title_html).to eq existing_post.title_html
 
-    expect { client.find_post(888888) }.to raise_error(Wpclient::NotFoundError)
+    expect { client.find_post(888888) }.to raise_error(WordpressClient::NotFoundError)
   end
 
   it "can create a post" do
@@ -41,7 +41,7 @@ describe "Posts (CRUD)" do
   it "raises a validation error if post could not be created" do
     expect {
       client.create_post(status: "not really valid")
-    }.to raise_error(Wpclient::ValidationError, /status/)
+    }.to raise_error(WordpressClient::ValidationError, /status/)
   end
 
   it "can update a post" do
@@ -57,11 +57,11 @@ describe "Posts (CRUD)" do
 
     expect {
       client.update_post(existing_post.id, status: "not really valid")
-    }.to raise_error(Wpclient::ValidationError, /status/)
+    }.to raise_error(WordpressClient::ValidationError, /status/)
 
     expect {
       client.update_post(888888, title: "Never existed in the first place")
-    }.to raise_error(Wpclient::NotFoundError)
+    }.to raise_error(WordpressClient::NotFoundError)
   end
 
   it "correctly handles HTML" do
@@ -95,7 +95,7 @@ describe "Posts (CRUD)" do
 
     expect {
       client.find_post(post.id)
-    }.to raise_error(Wpclient::NotFoundError)
+    }.to raise_error(WordpressClient::NotFoundError)
   end
 
   it "raises an error when deleting a post that does not exist" do
@@ -103,11 +103,11 @@ describe "Posts (CRUD)" do
 
     expect {
       client.find_post(post_id)
-    }.to raise_error(Wpclient::NotFoundError)
+    }.to raise_error(WordpressClient::NotFoundError)
 
     expect {
       client.delete_post(99999999)
-    }.to raise_error(Wpclient::NotFoundError)
+    }.to raise_error(WordpressClient::NotFoundError)
   end
 
   def find_existing_post

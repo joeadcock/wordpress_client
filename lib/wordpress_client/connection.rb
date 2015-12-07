@@ -1,7 +1,7 @@
 require "faraday"
 require "json"
 
-module Wpclient
+module WordpressClient
   class Connection
     attr_reader :url, :username
 

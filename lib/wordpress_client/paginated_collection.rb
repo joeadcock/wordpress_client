@@ -1,6 +1,6 @@
 require "delegate"
 
-module Wpclient
+module WordpressClient
   class PaginatedCollection < DelegateClass(Array)
     attr_reader :total, :current_page, :per_page
 
