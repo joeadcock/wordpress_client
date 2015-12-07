@@ -6,8 +6,8 @@ require 'wordpress_client/version'
 Gem::Specification.new do |spec|
   spec.name          = "wordpress_client"
   spec.version       = WordpressClient::VERSION
-  spec.authors       = ["Magnus Bergmark"]
-  spec.email         = ["magnus.bergmark@gmail.com"]
+  spec.authors       = ["Magnus Bergmark", "Rebecca Meritz"]
+  spec.email         = ["magnus.bergmark@gmail.com", "rebecca@meritz.com"]
   spec.summary       = "A simple client to the Wordpress API."
   spec.description   = "A simple client to the Wordpress API."
   spec.homepage      = ""
