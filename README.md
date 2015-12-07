@@ -4,7 +4,7 @@ WordpressClient is a very simple client to the Wordpress API, version 2 beta 8.0
 
 **NOTE:** The repository is still named `wpclient` as we're in the middle of a rename. Some references might persist until it's completed.
 
-[![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient) [![Code Climate](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/gpa.svg)](https://codeclimate.com/repos/5645938269568041da00cded/feed) [![Test Coverage](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/coverage.svg)](https://codeclimate.com/repos/5645938269568041da00cded/coverage)
+[![Circle CI](https://circleci.com/gh/hemnet/wpclient.svg?style=svg)](https://circleci.com/gh/hemnet/wpclient) [![Code Climate](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/gpa.svg)](https://codeclimate.com/repos/5645938269568041da00cded/feed) [![Test Coverage](https://codeclimate.com/repos/5645938269568041da00cded/badges/5e870b57428f23c1f2ff/coverage.svg)](https://codeclimate.com/repos/5645938269568041da00cded/coverage) [![Gem Version](https://badge.fury.io/rb/wordpress_client.svg)](https://badge.fury.io/rb/wordpress_client)
 
 ## Usage
 
