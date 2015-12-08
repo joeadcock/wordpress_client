@@ -9,11 +9,15 @@ module DockerRunner
   end
 
   def image_exists?(name)
-    system("docker images | grep -q '^#{name.shellescape} '")
+    name, tag = name.split(":", 2)
+    matcher = "^#{name} "
+    matcher << "[[:space:]]*#{tag}" if tag
+
+    system("docker images | grep -q #{matcher.shellescape}")
   end
 
   def build_image(name, path: Dir.pwd)
-    system("cd #{path.shellescape} && docker build -t #{name.shellescape} .")
+    system("docker build -t #{name.shellescape} #{path.shellescape}")
   end
 
   def run_container(name, port:, environment: {})

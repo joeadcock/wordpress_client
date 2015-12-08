@@ -36,7 +36,9 @@ updated_post.title_html # => "Updated"
 
 You need to install Docker and set it up for your machine. Note that you need `docker-machine` to run Docker on OS X.
 
-Run tests using the normal `rspec` command after installing all bundles. The first time the integration tests are run, a docker image will be built that hosts a Wordpress installation, but the image will be re-used on subsequent runs.
+Then build the docker image using `rake docker:build`.
+
+Run tests using the normal `rspec` command after installing all bundles.
 
 ```
 bundle exec rspec
@@ -51,6 +53,12 @@ end
 ```
 
 The normal `rspec` command will *not* use this filter in case it is ever committed accidentally, so CI can catch any problems.
+
+## Releasing a new version
+
+The normal gem release cycle works using `rake release`.
+
+If you make changes to the docker image, you can release it using `rake docker:release`.
 
 ## Copyright & License
 

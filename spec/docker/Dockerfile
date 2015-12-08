@@ -13,11 +13,14 @@ ENV APP_USER admin
 ENV APP_PASS P@ssw0rd
 ENV WP_KEY ILoveFlappyjacks
 
+# Make pretty permalinks work so API is accessible
+COPY htaccess /var/www/html/wordpress/.htaccess
+
 # Restore a copy of a set up database on first boot
 COPY dbdump.sql.gz /tmp/dbdump.sql.gz
 COPY restore-dbdump.sh /tmp/.restore-dbdump.sh
 RUN chmod +x /tmp/.restore-dbdump.sh && \
-    echo "if [ -f /tmp/.restore-dbdump.sh ]; then /tmp/.restore-dbdump.sh; rm -fr /tmp/.restore-dbdump.sh; fi" >> /root/.bashrc
+    echo "if [ -f /tmp/.restore-dbdump.sh ]; then /tmp/.restore-dbdump.sh; rm /tmp/.restore-dbdump.sh; fi" >> /root/.bashrc
 
 ### Install API and API Basic Auth plugins
 
@@ -35,6 +38,3 @@ RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-ap
 RUN curl -SL https://github.com/WP-API/Basic-Auth/archive/master.tar.gz \
   | tar -xzC /var/www/html/wordpress/wp-content/plugins/ \
   && mv /var/www/html/wordpress/wp-content/plugins/Basic-Auth* /var/www/html/wordpress/wp-content/plugins/basic-auth
-
-# Make pretty permalinks work so API is accessible
-COPY htaccess /var/www/html/wordpress/.htaccess

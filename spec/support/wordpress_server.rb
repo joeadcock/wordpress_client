@@ -24,6 +24,8 @@ class WordpressServer
   def password() "test" end
 
   private
+  DOCKER_IMAGE_NAME = "hemnet/wordpress_client_test:dev".freeze
+
   def host_with_port
     "#{host}:#{port}"
   end
@@ -62,14 +64,14 @@ class WordpressServer
   end
 
   def build_container_if_missing
-    unless DockerRunner.image_exists?("wpclient-test")
-      DockerRunner.build_image("wpclient-test", path: "spec/docker")
+    unless DockerRunner.image_exists?(DOCKER_IMAGE_NAME)
+      DockerRunner.build_image(DOCKER_IMAGE_NAME, path: "spec/docker")
     end
   end
 
   def start_container
     DockerRunner.run_container(
-      "wpclient-test",
+      DOCKER_IMAGE_NAME,
       port: port,
       environment: {wordpress_host: host_with_port}
     )
