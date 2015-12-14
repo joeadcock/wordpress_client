@@ -1,4 +1,8 @@
 require "bundler/gem_tasks"
+require "yard"
+require "wordpress_client/version"
+
+YARD::Rake::YardocTask.new
 
 namespace :docker do
   DOCKER_DIR = File.expand_path("../spec/docker", __FILE__).freeze
