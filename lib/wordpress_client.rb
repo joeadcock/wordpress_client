@@ -19,7 +19,26 @@ require "wordpress_client/replace_terms"
 require "wordpress_client/replace_metadata"
 
 module WordpressClient
-  def self.new(*args)
-    Client.new(Connection.new(*args))
+  # Initialize a new client using the provided connection details.
+  # You need to provide authentication details, and the user must have +edit+
+  # permissions on the blog if you want to read Post Meta, or to modify
+  # anything.
+  #
+  # @example
+  #   client = WordpressClient.new(
+  #     url: "https://blog.example.com/wp-json",
+  #     username: "bot",
+  #     password: ENV.fetch("WORDPRESS_PASSWORD"),
+  #   )
+  #
+  # @see Client Client, for the methods available after creating the connection.
+  #
+  # @param url [String] The base URL to the wordpress install, including
+  #                     +/wp-json+.
+  # @param username [String] A valid username on the wordpress installation.
+  # @param password [String] The password for the provided user.
+  # @return {Client}
+  def self.new(url:, username:, password:)
+    Client.new(Connection.new(url: url, username: username, password: password))
   end
 end
