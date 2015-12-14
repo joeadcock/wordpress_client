@@ -4,6 +4,8 @@ module WordpressClient
       @connection = connection
     end
 
+    # @!group Posts
+
     def posts(per_page: 10, page: 1, category_slug: nil, tag_slug: nil)
       filter = {}
       filter[:category_name] = category_slug if category_slug
@@ -11,18 +13,6 @@ module WordpressClient
       connection.get_multiple(
         Post, "posts", per_page: per_page, page: page, _embed: nil, context: "edit", filter: filter
       )
-    end
-
-    def categories(per_page: 10, page: 1)
-      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
-    end
-
-    def tags(per_page: 10, page: 1)
-      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
-    end
-
-    def media(per_page: 10, page: 1)
-      connection.get_multiple(Media, "media", page: page, per_page: per_page)
     end
 
     def find_post(id)
@@ -40,18 +30,6 @@ module WordpressClient
       end
     end
 
-    def find_category(id)
-      connection.get(Category, "terms/category/#{id.to_i}")
-    end
-
-    def find_tag(id)
-      connection.get(Tag, "terms/tag/#{id.to_i}")
-    end
-
-    def find_media(id)
-      connection.get(Media, "media/#{id.to_i}")
-    end
-
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
@@ -65,14 +43,6 @@ module WordpressClient
       else
         post
       end
-    end
-
-    def create_category(attributes)
-      connection.create(Category, "terms/category", attributes)
-    end
-
-    def create_tag(attributes)
-      connection.create(Tag, "terms/tag", attributes)
     end
 
     def update_post(id, attributes)
@@ -90,16 +60,54 @@ module WordpressClient
       end
     end
 
+    def delete_post(id, force: false)
+      connection.delete("posts/#{id.to_i}", {"force" => force})
+    end
+
+    # @!group Categories
+
+    def categories(per_page: 10, page: 1)
+      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
+    end
+
+    def find_category(id)
+      connection.get(Category, "terms/category/#{id.to_i}")
+    end
+
+    def create_category(attributes)
+      connection.create(Category, "terms/category", attributes)
+    end
+
     def update_category(id, attributes)
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
+    end
+
+    # @!group Tags
+
+    def tags(per_page: 10, page: 1)
+      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+    end
+
+    def find_tag(id)
+      connection.get(Tag, "terms/tag/#{id.to_i}")
+    end
+
+    def create_tag(attributes)
+      connection.create(Tag, "terms/tag", attributes)
     end
 
     def update_tag(id, attributes)
       connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
     end
 
-    def update_media(id, attributes)
-      connection.patch(Media, "media/#{id.to_i}", attributes)
+    # @!group Media
+
+    def media(per_page: 10, page: 1)
+      connection.get_multiple(Media, "media", page: page, per_page: per_page)
+    end
+
+    def find_media(id)
+      connection.get(Media, "media/#{id.to_i}")
     end
 
     def upload(io, mime_type:, filename:)
@@ -113,9 +121,11 @@ module WordpressClient
       end
     end
 
-    def delete_post(id, force: false)
-      connection.delete("posts/#{id.to_i}", {"force" => force})
+    def update_media(id, attributes)
+      connection.patch(Media, "media/#{id.to_i}", attributes)
     end
+
+    # @!endgroup
 
     def inspect
       "#<WordpressClient::Client #{connection.inspect}>"
