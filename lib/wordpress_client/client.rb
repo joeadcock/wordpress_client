@@ -6,6 +6,17 @@ module WordpressClient
 
     # @!group Posts
 
+    # Find posts matching given parameters.
+    #
+    # @example Finding 5 posts in the Important category
+    #   posts = client.posts(per_page: 5, category_slug: "important")
+    #
+    # @param page [Fixnum] Current page for pagination. Defaults to 1.
+    # @param per_page [Fixnum] Posts per page. Defaults to 10.
+    # @param category_slug [String, nil] Find posts belonging to a category with the given slug.
+    # @param tag_slug [String, nil] Find posts belonging to a tag with the given slug.
+    #
+    # @return {PaginatedCollection[Post]} Paginated collection of the found posts.
     def posts(per_page: 10, page: 1, category_slug: nil, tag_slug: nil)
       filter = {}
       filter[:category_name] = category_slug if category_slug
@@ -15,10 +26,20 @@ module WordpressClient
       )
     end
 
+    # Find the post with the given ID, or raises an error if it cannot be found.
+    #
+    # @return {Post}
+    # @raise {NotFoundError}
     def find_post(id)
       connection.get(Post, "posts/#{id.to_i}", _embed: nil, context: "edit")
     end
 
+    # Find the first post with the given slug, or raises an error if it cannot be found.
+    #
+    # @todo Rename to +find_post_by_slug+.
+    #
+    # @return {Post}
+    # @raise {NotFoundError}
     def find_by_slug(slug)
       posts = connection.get_multiple(
         Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
@@ -30,6 +51,26 @@ module WordpressClient
       end
     end
 
+    # Create a new {Post} with the given attributes in Wordpress and return it.
+    #
+    # In addition to {http://v2.wp-api.org/reference/posts/ the accepted
+    # parameters of the API}, this method also takes the following keys:
+    # * +:meta+
+    # * +:category_ids+
+    # * +:tag_ids+
+    #
+    # @see http://v2.wp-api.org/reference/posts/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   accepted parameters or the custom parameters listed
+    #                   above.
+    # @option attributes [Hash<String,String>] meta Hash of meta values.
+    # @option attributes [Array<Fixnum>] category_ids List of category IDs the
+    #                                    Post should belong to.
+    # @option attributes [Array<Fixnum>] tag_ids List of tag IDs the Post
+    #                                    should have.
+    #
+    # @return {Post}
+    # @raise {ValidationError}
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
@@ -45,6 +86,33 @@ module WordpressClient
       end
     end
 
+    # Update the {Post} with the given id, setting the supplied attributes in
+    # Wordpress and returning an updated Post.
+    #
+    # In addition to {http://v2.wp-api.org/reference/posts/ the accepted
+    # parameters of the API}, this method also takes the following keys:
+    # * +:meta+
+    # * +:category_ids+
+    # * +:tag_ids+
+    #
+    # @example Changing the title of a Post
+    #   new_post = client.update_post(post.id, title: "A better title")
+    #   new_post.title_html #=> "A better title"
+    #
+    # @see http://v2.wp-api.org/reference/posts/ List of accepted parameters
+    # @param id [Fixnum] ID of the post to update.
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   accepted parameters or the custom parameters listed
+    #                   above.
+    # @option attributes [Hash<String,String>] meta Hash of meta values.
+    # @option attributes [Array<Fixnum>] category_ids List of category IDs the
+    #                                    Post should belong to.
+    # @option attributes [Array<Fixnum>] tag_ids List of tag IDs the Post
+    #                                    should have.
+    #
+    # @return {Post}
+    # @raise {NotFoundError}
+    # @raise {ValidationError}
     def update_post(id, attributes)
       post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
 
@@ -60,24 +128,61 @@ module WordpressClient
       end
     end
 
+    # Deletes the {Post} with the given ID.
+    #
+    # @param id [Fixnum] The {Post} ID.
+    # @param force [Boolean] When +false+, the Post will be put in the "Trash"
+    #        of Wordpress. +true+ causes the Post to be irrevocably deleted.
+    #
+    # @return true always
     def delete_post(id, force: false)
       connection.delete("posts/#{id.to_i}", {"force" => force})
     end
 
     # @!group Categories
 
+    # Find {Category Categories} in the Wordpress install.
+    #
+    # @return {PaginatedCollection[Category]}
     def categories(per_page: 10, page: 1)
       connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
     end
 
+    # Find {Category} with the given ID.
+    #
+    # @return {Category}
+    # @raise {NotFoundError}
     def find_category(id)
       connection.get(Category, "terms/category/#{id.to_i}")
     end
 
+    # Create a new {Category} with the given attributes.
+    #
+    # @see http://v2.wp-api.org/reference/taxonomies/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   parameters accepted by the API.
+    # @option attributes [String] name Name of the category (required).
+    # @option attributes [String] slug Slug of the category (optional).
+    # @option attributes [String] description Description of the category (optional).
+    #
+    # @return {Category} the new Category
+    # @raise {ValidationError}
     def create_category(attributes)
       connection.create(Category, "terms/category", attributes)
     end
 
+    # Update the {Category} with the given id, setting the supplied attributes.
+    #
+    # @see http://v2.wp-api.org/reference/taxonomies/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   parameters accepted by the API.
+    # @option attributes [String] name Name of the category.
+    # @option attributes [String] slug Slug of the category.
+    # @option attributes [String] description Description of the category.
+    #
+    # @return {Category} the updated Category
+    # @raise {NotFoundError}
+    # @raise {ValidationError}
     def update_category(id, attributes)
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
