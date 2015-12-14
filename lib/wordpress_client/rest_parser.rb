@@ -1,4 +1,8 @@
 module WordpressClient
+  # @private
+  #
+  # Module included in other classes that need to parse result bodies from the
+  # WP API.
   module RestParser
     private
     def rendered(name)
