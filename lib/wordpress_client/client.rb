@@ -36,11 +36,9 @@ module WordpressClient
 
     # Find the first post with the given slug, or raises an error if it cannot be found.
     #
-    # @todo Rename to +find_post_by_slug+.
-    #
     # @return {Post}
     # @raise {NotFoundError}
-    def find_by_slug(slug)
+    def find_post_by_slug(slug)
       posts = connection.get_multiple(
         Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
       )
