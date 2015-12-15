@@ -189,36 +189,110 @@ module WordpressClient
 
     # @!group Tags
 
+    # Find {Tag Tags} in the Wordpress install.
+    #
+    # @return {PaginatedCollection[Tag]}
     def tags(per_page: 10, page: 1)
       connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
     end
 
+    # Find {Tag} with the given ID.
+    #
+    # @return {Tag}
+    # @raise {NotFoundError}
     def find_tag(id)
       connection.get(Tag, "terms/tag/#{id.to_i}")
     end
 
+    # Create a new {Tag} with the given attributes.
+    #
+    # @see http://v2.wp-api.org/reference/taxonomies/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   parameters accepted by the API.
+    # @option attributes [String] name Name of the tag (required).
+    # @option attributes [String] slug Slug of the tag (optional).
+    # @option attributes [String] description Description of the tag (optional).
+    #
+    # @return {Tag} the new Tag
+    # @raise {ValidationError}
     def create_tag(attributes)
       connection.create(Tag, "terms/tag", attributes)
     end
 
+    # Update the {Tag} with the given id, setting the supplied attributes.
+    #
+    # @see http://v2.wp-api.org/reference/taxonomies/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   parameters accepted by the API.
+    # @option attributes [String] name Name of the tag.
+    # @option attributes [String] slug Slug of the tag.
+    # @option attributes [String] description Description of the tag.
+    #
+    # @return {Tag} the updated Tag
+    # @raise {NotFoundError}
+    # @raise {ValidationError}
     def update_tag(id, attributes)
       connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
     end
 
     # @!group Media
 
+    # Find {Media} in the Wordpress install.
+    #
+    # @return {PaginatedCollection[Media]}
     def media(per_page: 10, page: 1)
       connection.get_multiple(Media, "media", page: page, per_page: per_page)
     end
 
+    # Find {Media} with the given ID.
+    #
+    # @return {Media}
+    # @raise {NotFoundError}
     def find_media(id)
       connection.get(Media, "media/#{id.to_i}")
     end
 
+    # Create a new {Media} by uploading a IO stream.
+    #
+    # You need to provide both MIME type and filename for Wordpress to accept
+    # the file.
+    #
+    # @example Uploading a JPEG from a request
+    #   media = client.upload(
+    #     request.body_stream, filename: "foo.jpg", mime_type: "image/jpeg"
+    #   )
+    #
+    # @param io [IO-like object] IO stream (for example an open file) that will
+    #        be the body of the media.
+    # @param mime_type [String] the MIME type of the IO stream
+    # @param filename [String] the filename that Wordpress should see. Requires
+    #        a file extension to make Wordpress happy.
+    #
+    # @return {Media} the new Media
+    # @raise {ValidationError}
+    # @see #upload_file #upload_file - a shortcut for uploading files on disk
     def upload(io, mime_type:, filename:)
       connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
     end
 
+    # Create a new {Media} by uploading a file from disk.
+    #
+    # You need to provide MIME type for Wordpress to accept the file. The
+    # filename that Wordpress sees will automatically be derived from the
+    # passed path.
+    #
+    # @example Uploading a JPEG from disk
+    #   media = client.upload_file(
+    #     "assets/ocean.jpg", mime_type: "image/jpeg"
+    #   )
+    #
+    # @param filename [String] a path to a readable file.
+    # @param mime_type [String] the MIME type of the file.
+    #
+    # @return {Media} the new Media
+    # @raise {ValidationError}
+    # @see #upload #upload - for when you want to upload something that isn't a
+    #              file on disk, or need extra flexibility
     def upload_file(filename, mime_type:)
       path = filename.to_s
       File.open(path, 'r') do |file|
@@ -226,6 +300,15 @@ module WordpressClient
       end
     end
 
+    # Update the {Media} with the given id, setting the supplied attributes.
+    #
+    # @see http://v2.wp-api.org/reference/media/ List of accepted parameters
+    # @param attributes [Hash<Symbol,Object>] attribute list, containing
+    #                   parameters accepted by the API.
+    #
+    # @return {Media} The updated Media
+    # @raise {NotFoundError}
+    # @raise {ValidationError}
     def update_media(id, attributes)
       connection.patch(Media, "media/#{id.to_i}", attributes)
     end
