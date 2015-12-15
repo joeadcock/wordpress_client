@@ -66,7 +66,7 @@ module WordpressClient
           Post, "posts", hash_including(filter: {name: "my-slug"})
         ).and_return [post]
 
-        expect(client.find_by_slug("my-slug")).to eq post
+        expect(client.find_post_by_slug("my-slug")).to eq post
       end
 
       it "raises NotFoundError when trying to find by slug yields no posts" do
@@ -75,7 +75,7 @@ module WordpressClient
         ).and_return []
 
         expect {
-          client.find_by_slug("my-slug")
+          client.find_post_by_slug("my-slug")
         }.to raise_error(NotFoundError, /my-slug/)
       end
     end
