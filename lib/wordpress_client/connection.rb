@@ -2,6 +2,7 @@ require "faraday"
 require "json"
 
 module WordpressClient
+  # @private
   class Connection
     attr_reader :url, :username
 

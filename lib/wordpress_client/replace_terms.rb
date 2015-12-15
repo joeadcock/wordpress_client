@@ -1,6 +1,7 @@
 require "set"
 
 module WordpressClient
+  # @private
   class ReplaceTerms
     def self.apply_categories(connection, post, category_ids)
       instance = new(
