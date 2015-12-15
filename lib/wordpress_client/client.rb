@@ -29,7 +29,7 @@ module WordpressClient
       connection.get(Post, "posts/#{id.to_i}", _embed: nil, context: "edit")
     end
 
-    def find_by_slug(slug)
+    def find_post_by_slug(slug)
       posts = connection.get_multiple(
         Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
       )
