@@ -1,4 +1,5 @@
 module WordpressClient
+  # @private
   class MediaParser
     include RestParser
 

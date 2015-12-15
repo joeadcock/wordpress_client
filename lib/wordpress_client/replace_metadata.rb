@@ -1,6 +1,7 @@
 require "set"
 
 module WordpressClient
+  # @private
   class ReplaceMetadata
     def self.apply(connection, post, meta)
       instance = new(connection, post, meta)
