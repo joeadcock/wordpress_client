@@ -6,7 +6,7 @@ module WordpressClient
 
     # @!group Posts
 
-    # Find posts matching given parameters.
+    # Find {Post Posts} matching given parameters.
     #
     # @example Finding 5 posts in the Important category
     #   posts = client.posts(per_page: 5, category_slug: "important")
@@ -26,18 +26,20 @@ module WordpressClient
       )
     end
 
-    # Find the post with the given ID, or raises an error if it cannot be found.
+    # Find the {Post} with the given ID, or raises an error if not found.
     #
     # @return {Post}
     # @raise {NotFoundError}
+    # @raise {subclasses of Error} on other unexpected errors
     def find_post(id)
       connection.get(Post, "posts/#{id.to_i}", _embed: nil, context: "edit")
     end
 
-    # Find the first post with the given slug, or raises an error if it cannot be found.
+    # Find the first {Post} with the given slug, or raises an error if it cannot be found.
     #
     # @return {Post}
     # @raise {NotFoundError}
+    # @raise {subclasses of Error} on other unexpected errors
     def find_post_by_slug(slug)
       posts = connection.get_multiple(
         Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
@@ -69,6 +71,7 @@ module WordpressClient
     #
     # @return {Post}
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def create_post(attributes)
       post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
 
@@ -111,6 +114,7 @@ module WordpressClient
     # @return {Post}
     # @raise {NotFoundError}
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def update_post(id, attributes)
       post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
 
@@ -150,6 +154,7 @@ module WordpressClient
     #
     # @return {Category}
     # @raise {NotFoundError}
+    # @raise {subclasses of Error} on other unexpected errors
     def find_category(id)
       connection.get(Category, "terms/category/#{id.to_i}")
     end
@@ -165,6 +170,7 @@ module WordpressClient
     #
     # @return {Category} the new Category
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def create_category(attributes)
       connection.create(Category, "terms/category", attributes)
     end
@@ -181,6 +187,7 @@ module WordpressClient
     # @return {Category} the updated Category
     # @raise {NotFoundError}
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def update_category(id, attributes)
       connection.patch(Category, "terms/category/#{id.to_i}", attributes)
     end
@@ -198,6 +205,7 @@ module WordpressClient
     #
     # @return {Tag}
     # @raise {NotFoundError}
+    # @raise {subclasses of Error} on other unexpected errors
     def find_tag(id)
       connection.get(Tag, "terms/tag/#{id.to_i}")
     end
@@ -213,6 +221,7 @@ module WordpressClient
     #
     # @return {Tag} the new Tag
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def create_tag(attributes)
       connection.create(Tag, "terms/tag", attributes)
     end
@@ -229,6 +238,7 @@ module WordpressClient
     # @return {Tag} the updated Tag
     # @raise {NotFoundError}
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def update_tag(id, attributes)
       connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
     end
@@ -246,6 +256,7 @@ module WordpressClient
     #
     # @return {Media}
     # @raise {NotFoundError}
+    # @raise {subclasses of Error} on other unexpected errors
     def find_media(id)
       connection.get(Media, "media/#{id.to_i}")
     end
@@ -268,6 +279,7 @@ module WordpressClient
     #
     # @return {Media} the new Media
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     # @see #upload_file #upload_file - a shortcut for uploading files on disk
     def upload(io, mime_type:, filename:)
       connection.upload(Media, "media", io, mime_type: mime_type, filename: filename)
@@ -289,6 +301,7 @@ module WordpressClient
     #
     # @return {Media} the new Media
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     # @see #upload #upload - for when you want to upload something that isn't a
     #              file on disk, or need extra flexibility
     def upload_file(filename, mime_type:)
@@ -307,6 +320,7 @@ module WordpressClient
     # @return {Media} The updated Media
     # @raise {NotFoundError}
     # @raise {ValidationError}
+    # @raise {subclasses of Error} on other unexpected errors
     def update_media(id, attributes)
       connection.patch(Media, "media/#{id.to_i}", attributes)
     end

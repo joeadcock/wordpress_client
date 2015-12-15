@@ -30,7 +30,7 @@ module WordpressClient
   # Raised when trying to find a resource that doesn't exist. It will also
   # happen when you try to update a resource that doesn't exist.
   #
-  # Lack of authorization could also mask actual resources so it appears that
+  # Lack of authorization can also mask actual resources so it appears that
   # they don't exist.
   #
   # @see Error
