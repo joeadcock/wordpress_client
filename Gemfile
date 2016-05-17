@@ -5,7 +5,7 @@ gemspec
 
 gem "codeclimate-test-reporter", group: :test, require: nil
 
-group :development do
+group :guard do
   gem 'guard', '~> 2.13'
   gem 'guard-rspec', '~> 4.6'
 end
