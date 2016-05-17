@@ -5,6 +5,11 @@ gemspec
 
 gem "codeclimate-test-reporter", group: :test, require: nil
 
+group :development, :test do
+  gem 'pry'
+  gem 'pry-byebug', require: true
+end
+
 group :guard do
   gem 'guard', '~> 2.13'
   gem 'guard-rspec', '~> 4.6'

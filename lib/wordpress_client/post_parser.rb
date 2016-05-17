@@ -63,7 +63,7 @@ module WordpressClient
     def assign_featured_image(post)
       featured_id = data["featured_image"]
       if featured_id
-        features = (embedded["https://api.w.org/featuredmedia"] || []).flatten
+        features = (embedded["wp:featuredmedia"] || []).flatten
         media = features.detect { |feature| feature["id"] == featured_id }
         if media
           post.featured_image = Media.parse(media)
@@ -72,7 +72,7 @@ module WordpressClient
     end
 
     def parse_metadata
-      embedded_metadata = (embedded["https://api.w.org/meta"] || []).flatten
+      embedded_metadata = (embedded["wp:meta"] || []).flatten
       validate_embedded_metadata(embedded_metadata)
 
       meta = {}
@@ -87,7 +87,7 @@ module WordpressClient
     end
 
     def embedded_terms(type)
-      term_collections = embedded["https://api.w.org/term"] || []
+      term_collections = embedded["wp:term"] || embedded["https://api.w.org/term"] || []
 
       # term_collections is an array of arrays with terms in them. We can see
       # the type of the "collection" by inspecting the first child's taxonomy.

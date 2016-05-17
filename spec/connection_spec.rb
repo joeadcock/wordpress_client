@@ -6,7 +6,7 @@ module WordpressClient
       Connection.new(url: "http://example.com/", username: "jane", password: "doe")
     }
 
-    let(:base_url) { "http://jane:doe@example.com/wp/v2" }
+    let(:base_url) { "http://example.com/wp/v2" }
     let(:model) { class_double(Post, parse: model_instance) }
     let(:model_instance) { instance_double(Post) }
 
@@ -235,11 +235,12 @@ module WordpressClient
       headers = {"content-type" => "#{content_type}; charset=utf-8"}
       headers["X-WP-Total"] = total.to_s if total
 
-      stub_request(:get, path).to_return(status: status, body: body, headers: headers)
+      stub_request(:get, path).with(basic_auth: ['jane', 'doe']).to_return(status: status, body: body, headers: headers)
     end
 
     def stub_successful_post_with_redirect(path, data, redirects_to:)
       stub_request(:post, path).with(
+        basic_auth: ['jane', 'doe'],
         headers: {"content-type" => "application/json; charset=#{"".encoding}"},
         body: data.to_json,
       ).to_return(
@@ -249,7 +250,9 @@ module WordpressClient
     end
 
     def stub_failing_post(path, returns:, status:)
-      stub_request(:post, path).to_return(
+      stub_request(:post, path).with(
+        basic_auth: ['jane', 'doe']
+      ).to_return(
         status: status,
         body: returns.to_json,
         headers: {"content-type" => "application/json; charset=utf-8"},
@@ -258,6 +261,7 @@ module WordpressClient
 
     def stub_patch(path, data, returns:, status: 200)
       stub_request(:patch, path).with(
+        basic_auth: ['jane', 'doe'],
         headers: {"content-type" => "application/json; charset=#{"".encoding}"},
         body: data.to_json,
       ).to_return(
