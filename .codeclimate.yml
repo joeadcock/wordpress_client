@@ -1,12 +1,23 @@
----
 engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
   rubocop:
     enabled: true
   fixme:
     enabled: true
+    config:
+      strings:
+      - FIXME
+      - TODO
 ratings:
   paths:
-  - lib/**/*.rb
+  - Gemfile.lock
+  - lib/**
+  - "**.rb"
 exclude_paths:
-- spec/**/*
-- ".*"
+  - doc/**/*
+  - spec/**/*
+  - tmp/**/*
