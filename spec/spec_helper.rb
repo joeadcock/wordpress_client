@@ -4,6 +4,7 @@ if ENV['CODECLIMATE_REPO_TOKEN']
 end
 
 require "webmock/rspec"
+require "pry"
 
 require_relative "support/wordpress_server"
 require_relative "support/fixtures"
