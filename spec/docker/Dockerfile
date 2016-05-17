@@ -38,3 +38,12 @@ RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-ap
 RUN curl -SL https://github.com/WP-API/Basic-Auth/archive/master.tar.gz \
   | tar -xzC /var/www/html/wordpress/wp-content/plugins/ \
   && mv /var/www/html/wordpress/wp-content/plugins/Basic-Auth* /var/www/html/wordpress/wp-content/plugins/basic-auth
+
+# The appcontainer will run apache in the foreground after running their setup
+# script. The setup script will unset all the env variables with passwords and
+# other important information so they aren't exposed to the foregrounded apache
+# process, so for this reason we cannot just append our DB restore to that
+# script.
+# The container used to just run bash, and by switching back to that we get
+# everything working again.
+CMD /bin/bash
