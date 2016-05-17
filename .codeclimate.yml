@@ -6,8 +6,6 @@ engines:
       - ruby
   rubocop:
     enabled: true
-  bundler-audit:
-    enabled: true
   fixme:
     enabled: true
     config:
