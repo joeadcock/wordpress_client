@@ -40,7 +40,7 @@ describe "Attachments" do
   it "uses HTML for the title" do
     media = find_or_create_attachment
     updated = client.update_media(media.id, title: "Images & paint")
-    expect(updated.title_html).to eq "Images &amp; paint"
+    expect(updated.title_html).to eq "Images &#038; paint"
   end
 
   def find_or_create_attachment

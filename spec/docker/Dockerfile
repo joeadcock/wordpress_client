@@ -9,6 +9,11 @@ RUN wget -P /var/www/html/ https://wordpress.org/latest.zip && \
 # Copy the WP-Config file
 RUN cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
+# White list custom metadata fields
+RUN echo "register_meta('post', 'foo', array('type' => 'integer', 'description' => 'Some kind of integer', 'single' => true, 'show_in_rest' => true));" >>/var/www/html/wordpress/wp-config.php
+RUN echo "register_meta('post', 'bar', array('type' => 'boolean', 'description' => 'Some kind of boolean', 'single' => true, 'show_in_rest' => true));" >>/var/www/html/wordpress/wp-config.php
+RUN echo "register_meta('post', 'baz', array('type' => 'string', 'description' => 'Some kind of string', 'single' => true, 'show_in_rest' => true));" >>/var/www/html/wordpress/wp-config.php
+
 # base image only contains American timezones
 RUN yum install -y tzdata
 
@@ -35,12 +40,6 @@ RUN chmod +x /tmp/.restore-dbdump.sh && \
 
 # We need tar to unpack the WP plugins
 RUN yum install -y tar
-
-# WP API
-# Get download link from https://wordpress.org/plugins/rest-api/
-RUN curl -SL -o /tmp/rest-api.zip https://downloads.wordpress.org/plugin/rest-api.2.0-beta8.zip \
-  && unzip /tmp/rest-api.zip -d /var/www/html/wordpress/wp-content/plugins/ \
-  && rm /tmp/rest-api.zip
 
 # Basic Auth
 # Get download link from GitHub or something.

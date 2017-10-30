@@ -135,31 +135,31 @@ module WordpressClient
           "id" => 1, "title" => "Bar"
         ).and_return(model_instance)
 
-        response = connection.patch(model, "foos/1", title: "Bar")
+        response = connection.put(model, "foos/1", title: "Bar")
         expect(response).to eq model_instance
       end
 
       it "can ignore responses" do
         stub_patch("#{base_url}/foos/1", {title: "Bar"}, returns: {id: 1, title: "Bar"})
-        response = connection.patch_without_response("foos/1", title: "Bar")
+        response = connection.put_without_response("foos/1", title: "Bar")
         expect(response).to be true
       end
 
       it "raises NotFoundError if response is 400 with rest_post_invalid_id as error code" do
         stub_patch(/./, {}, returns: json_fixture("invalid-post-id.json"), status: 400)
-        expect { connection.patch(model, "foo", {}) }.to raise_error(NotFoundError, /post id/i)
-        expect { connection.patch_without_response("foo", {}) }.to raise_error(NotFoundError)
+        expect { connection.put(model, "foo", {}) }.to raise_error(NotFoundError, /post id/i)
+        expect { connection.put_without_response("foo", {}) }.to raise_error(NotFoundError)
       end
 
       it "raises ValidationError on any other 400 responses" do
         stub_patch(/./, {}, returns: json_fixture("validation-error.json"), status: 400)
 
         expect {
-          connection.patch(model, "foo", {})
+          connection.put(model, "foo", {})
         }.to raise_error(ValidationError, /status is not one of/)
 
         expect {
-          connection.patch_without_response("foo", {})
+          connection.put_without_response("foo", {})
         }.to raise_error(ValidationError, /status is not one of/)
       end
     end
@@ -199,10 +199,7 @@ module WordpressClient
           headers: {
             "content-length" => "11",
             "content-type" => "text/plain",
-            # WP API does not parse normal Content-Disposition and instead ops
-            # to using their own format:
-            # https://github.com/WP-API/WP-API/issues/1744
-            "content-disposition" => 'filename=foo.txt',
+            "content-disposition" => 'attachment; filename="foo.txt"',
           },
           body: "hello world",
         ).to_return(
@@ -260,7 +257,7 @@ module WordpressClient
     end
 
     def stub_patch(path, data, returns:, status: 200)
-      stub_request(:patch, path).with(
+      stub_request(:put, path).with(
         basic_auth: ['jane', 'doe'],
         headers: {"content-type" => "application/json; charset=#{"".encoding}"},
         body: data.to_json,

@@ -13,16 +13,13 @@ module WordpressClient
     end
 
     def to_post
-      meta, meta_ids = parse_metadata
-      post = Post.new(meta: meta, meta_ids: meta_ids)
-
+      post = Post.new
       assign_basic(post)
       assign_dates(post)
       assign_rendered(post)
       assign_categories(post)
       assign_tags(post)
-      assign_featured_image(post)
-
+      assign_featured_media(post)
       post
     end
 
@@ -34,6 +31,10 @@ module WordpressClient
       post.slug = data["slug"]
       post.url = data["link"]
       post.status = data["status"]
+      post.meta = data["meta"]
+      post.category_ids = data["categories"]
+      post.tag_ids = data["tags"]
+      post.featured_media_id = data["featured_media"]
     end
 
     def assign_dates(post)
@@ -60,30 +61,18 @@ module WordpressClient
       end
     end
 
-    def assign_featured_image(post)
-      featured_id = data["featured_image"]
+    def assign_featured_media(post)
+      featured_id = data["featured_media"]
       if featured_id
         features = (embedded["wp:featuredmedia"] || []).flatten
         media = features.detect { |feature| feature["id"] == featured_id }
         if media
-          post.featured_image = Media.parse(media)
+          post.featured_media = Media.parse(media)
+          if media["media_type"] == "image"
+            post.featured_image = post.featured_media
+          end
         end
       end
-    end
-
-    def parse_metadata
-      embedded_metadata = (embedded["wp:meta"] || []).flatten
-      validate_embedded_metadata(embedded_metadata)
-
-      meta = {}
-      meta_ids = {}
-
-      embedded_metadata.each do |entry|
-        meta[entry.fetch("key")] = entry.fetch("value")
-        meta_ids[entry.fetch("key")] = entry.fetch("id")
-      end
-
-      [meta, meta_ids]
     end
 
     def embedded_terms(type)
@@ -96,19 +85,5 @@ module WordpressClient
       } || []
     end
 
-    def validate_embedded_metadata(embedded_metadata)
-      if embedded_metadata.size == 1 && embedded_metadata.first["code"]
-        error = embedded_metadata.first
-        case error["code"]
-        when "rest_forbidden"
-          raise UnauthorizedError, error.fetch(
-            "message", "You are not authorized to see meta for this post."
-          )
-        else
-          raise Error, "Could not retreive meta for this post: " \
-            "#{error["code"]} – #{error["message"]}"
-        end
-      end
-    end
   end
 end

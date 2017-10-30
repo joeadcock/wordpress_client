@@ -33,8 +33,8 @@ module WordpressClient
 
       expect(post.categories).to eq [
         Category.new(
-          id: 1, name_html: "Uncategorized", slug: "uncategorized"
-        )
+          id: 1, name_html: "Uncategorized", slug: "uncategorized",
+        ),
       ]
 
       expect(post.category_ids).to eq [1]
@@ -45,7 +45,7 @@ module WordpressClient
 
       expect(post.tags).to eq [
         Tag.new(
-          id: 2, name_html: "Foo", slug: "foo"
+          id: 2, name_html: "winamp", slug: "winamp",
         )
       ]
 
@@ -54,10 +54,8 @@ module WordpressClient
 
     it "can have a Media as featured image" do
       media = instance_double(Media, id: 12)
-      post = Post.new(featured_image: media)
-
-      expect(post.featured_image).to eq media
-      expect(post.featured_image_id).to eq 12
+      post = Post.new(featured_media: media)
+      expect(post.featured_media).to eq media
     end
 
     describe "dates" do
@@ -86,29 +84,5 @@ module WordpressClient
       end
     end
 
-    describe "metadata" do
-      it "is parsed into a hash" do
-        post = Post.parse(json_fixture("post-with-metadata.json"))
-        expect(post.meta).to eq "foo" => "bar"
-      end
-
-      it "raises UnauthorizedError when post it is forbidden" do
-        expect {
-          Post.parse(json_fixture("post-with-forbidden-metadata.json"))
-        }.to raise_error(UnauthorizedError)
-      end
-
-      it "keeps track of the ID of each metadata key" do
-        post = Post.parse(json_fixture("post-with-metadata.json"))
-        expect(post.meta_id_for("foo")).to eq 2
-      end
-
-      it "raises ArgumentError when asked for the meta ID of a meta key not present" do
-        post = Post.parse(json_fixture("post-with-metadata.json"))
-        expect {
-          post.meta_id_for("clearly unreal")
-        }.to raise_error(ArgumentError, /clearly unreal/)
-      end
-    end
   end
 end
