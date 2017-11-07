@@ -26,8 +26,6 @@ This image is based on Appcontainer's Wordpress image, which runs Apache, MySQL 
 
 * Username `test`
 * Password `test`
-* Plugin `WP-API` is installed
-* Plugin `Basic-Auth` for `WP-API` installed
 * `.htaccess` for Pretty Permalinks is set up so the API works
 
 ## Developing the image
