@@ -8,6 +8,7 @@ module WordpressClient
       media = Media.parse(fixture)
 
       expect(media.id).to eq 5
+      expect(media.media_type).to eq "image"
       expect(media.title_html).to eq "thoughtful"
       expect(media.slug).to eq "thoughtful"
       expect(media.description).to eq ""
@@ -57,6 +58,18 @@ module WordpressClient
 
         expect(media.date).to eq Time.local(2001, 1, 1, 12, 0, 0)
         expect(media.updated_at).to eq Time.local(2001, 1, 1, 12, 0, 0)
+      end
+    end
+
+    describe "#as_image" do
+      it "returns self if media_type is image" do
+        media = Media.parse(fixture)
+        expect(media.as_image).to eq(media)
+      end
+
+      it "returns nil when media_type is not image" do
+        media = Media.parse(fixture.merge("media_type" => "video"))
+        expect(media.as_image).to be_nil
       end
     end
   end

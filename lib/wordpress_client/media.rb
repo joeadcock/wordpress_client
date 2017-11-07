@@ -2,10 +2,15 @@ module WordpressClient
   # Represents a media record in Wordpress.
   class Media
     attr_accessor(
-      :id, :slug, :title_html, :description,
+      :id, :slug, :media_type, :title_html, :description,
       :date, :updated_at,
       :guid, :link, :media_details
     )
+
+    # @!attribute [r] media_type
+    #   @return [String] the type of the media
+    #   @example
+    #     media.media_type #=> "image"
 
     # @!attribute [rw] title_html
     #   @return [String] the title of the media, HTML escaped
@@ -45,6 +50,7 @@ module WordpressClient
     def initialize(
       id: nil,
       slug: nil,
+      media_type: nil,
       title_html: nil,
       description: nil,
       date: nil,
@@ -55,6 +61,7 @@ module WordpressClient
     )
       @id = id
       @slug = slug
+      @media_type = media_type
       @title_html = title_html
       @date = date
       @updated_at = updated_at
@@ -65,5 +72,12 @@ module WordpressClient
     end
 
     alias source_url guid
+
+    # Returns the same +Media+ instance if it is an image, else +nil+.
+    def as_image
+      if media_type == "image"
+        self
+      end
+    end
   end
 end

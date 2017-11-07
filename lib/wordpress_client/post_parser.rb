@@ -68,9 +68,6 @@ module WordpressClient
         media = features.detect { |feature| feature["id"] == featured_id }
         if media
           post.featured_media = Media.parse(media)
-          if media["media_type"] == "image"
-            post.featured_image = post.featured_media
-          end
         end
       end
     end
