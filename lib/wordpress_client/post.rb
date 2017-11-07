@@ -9,13 +9,14 @@ module WordpressClient
       :id, :slug, :url, :guid, :status,
       :title_html, :excerpt_html, :content_html,
       :updated_at, :date,
-      :categories, :tags, :meta, :featured_image
+      :categories, :tags, :meta, :featured_media,
+      :tag_ids, :category_ids, :featured_media_id
     )
 
     # @!attribute [rw] title_html
     #   @return [String] the title of the media, HTML escaped
     #   @example
-    #     post.title_html #=> "Fire &amp; diamonds!"
+    #     post.title_html #=> "Fire &#038; diamonds!"
 
     # @!attribute [rw] date
     #   @return [Time, nil] the date of the post, in UTC if available
@@ -42,7 +43,7 @@ module WordpressClient
     #   @return [Array[Tag]] the {Tag Tags} the post belongs to.
     #   @see Tag
 
-    # @!attribute [rw] featured_image
+    # @!attribute [rw] featured_media
     #   @return [Media, nil] the featured image, as an instance of {Media}
     #   @see Media
 
@@ -79,9 +80,10 @@ module WordpressClient
       date: nil,
       categories: [],
       tags: [],
-      featured_image: nil,
-      meta: {},
-      meta_ids: {}
+      category_ids: [],
+      tag_ids: [],
+      featured_media: nil,
+      meta: {}
     )
       @id = id
       @slug = slug
@@ -95,39 +97,17 @@ module WordpressClient
       @date = date
       @categories = categories
       @tags = tags
-      @featured_image = featured_image
+      @category_ids = category_ids
+      @tag_ids = tag_ids
+      @featured_media = featured_media
       @meta = meta
-      @meta_ids = meta_ids
     end
 
-    # A list of all category ids for the post.
-    #
-    # You can pass this list, with IDs added or removed, to
-    # {Client#update_post} to change the category list.
-    #
-    # @return [Array[Fixnum]] the id of every category associated with this post
-    # @see Client#update_post
-    def category_ids() categories.map(&:id) end
-
-    # A list of all tag ids for the post.
-    #
-    # You can pass this list, with IDs added or removed, to
-    # {Client#update_post} to change the tag list.
-    #
-    # @return [Array[Fixnum]] the id of every tag associated with this post
-    # @see Client#update_post
-    def tag_ids() tags.map(&:id) end
-
-    # @return [Fixnum, nil] ID of the featured image associated with the post.
-    def featured_image_id
-      featured_image && featured_image.id
-    end
-
-    # @api private
-    # Used to determine the underlying ID of the different meta keys so they
-    # can be modified by {Client}. You should not use this for anything.
-    def meta_id_for(key)
-      @meta_ids[key] || raise(ArgumentError, "Post does not have meta #{key.inspect}")
+    # Returns the featured media, if the featured media is an image.
+    def featured_image
+      if featured_media
+        featured_media.as_image
+      end
     end
   end
 end

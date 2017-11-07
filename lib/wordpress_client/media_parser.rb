@@ -27,6 +27,7 @@ module WordpressClient
 
     def assign_basic(media)
       media.id = data.fetch("id")
+      media.media_type = data.fetch("media_type")
       media.slug = data.fetch("slug")
       media.link = data.fetch("link")
       media.description = data["description"]

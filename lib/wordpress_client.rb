@@ -15,9 +15,6 @@ require "wordpress_client/post_parser"
 require "wordpress_client/media"
 require "wordpress_client/media_parser"
 
-require "wordpress_client/replace_terms"
-require "wordpress_client/replace_metadata"
-
 module WordpressClient
   # Initialize a new client using the provided connection details.
   # You need to provide authentication details, and the user must have +edit+

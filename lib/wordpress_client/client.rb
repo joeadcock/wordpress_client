@@ -8,21 +8,20 @@ module WordpressClient
 
     # Find {Post Posts} matching given parameters.
     #
-    # @example Finding 5 posts in the Important category
-    #   posts = client.posts(per_page: 5, category_slug: "important")
+    # @example Finding 5 posts
+    #   posts = client.posts(per_page: 5)
     #
     # @param page [Fixnum] Current page for pagination. Defaults to 1.
     # @param per_page [Fixnum] Posts per page. Defaults to 10.
-    # @param category_slug [String, nil] Find posts belonging to a category with the given slug.
-    # @param tag_slug [String, nil] Find posts belonging to a tag with the given slug.
     #
     # @return {PaginatedCollection[Post]} Paginated collection of the found posts.
-    def posts(per_page: 10, page: 1, category_slug: nil, tag_slug: nil)
-      filter = {}
-      filter[:category_name] = category_slug if category_slug
-      filter[:tag] = tag_slug if tag_slug
+    def posts(per_page: 10, page: 1)
       connection.get_multiple(
-        Post, "posts", per_page: per_page, page: page, _embed: nil, context: "edit", filter: filter
+        Post,
+        "posts",
+        per_page: per_page,
+        page: page,
+        _embed: nil,
       )
     end
 
@@ -32,23 +31,7 @@ module WordpressClient
     # @raise {NotFoundError}
     # @raise {subclasses of Error} on other unexpected errors
     def find_post(id)
-      connection.get(Post, "posts/#{id.to_i}", _embed: nil, context: "edit")
-    end
-
-    # Find the first {Post} with the given slug, or raises an error if it cannot be found.
-    #
-    # @return {Post}
-    # @raise {NotFoundError}
-    # @raise {subclasses of Error} on other unexpected errors
-    def find_post_by_slug(slug)
-      posts = connection.get_multiple(
-        Post, "posts", per_page: 1, page: 1, filter: {name: slug}, _embed: nil
-      )
-      if posts.size > 0
-        posts.first
-      else
-        raise NotFoundError, "Could not find post with slug #{slug.to_s.inspect}"
-      end
+      connection.get(Post, "posts/#{id.to_i}", _embed: nil)
     end
 
     # Create a new {Post} with the given attributes in Wordpress and return it.
@@ -73,18 +56,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def create_post(attributes)
-      post = connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
-
-      changes = 0
-      changes += assign_meta(post, attributes[:meta])
-      changes += assign_categories(post, attributes[:category_ids])
-      changes += assign_tags(post, attributes[:tag_ids])
-
-      if changes > 0
-        find_post(post.id)
-      else
-        post
-      end
+      connection.create(Post, "posts", attributes, redirect_params: {_embed: nil})
     end
 
     # Update the {Post} with the given id, setting the supplied attributes in
@@ -116,18 +88,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def update_post(id, attributes)
-      post = connection.patch(Post, "posts/#{id.to_i}?_embed", attributes)
-
-      changes = 0
-      changes += assign_meta(post, attributes[:meta])
-      changes += assign_categories(post, attributes[:category_ids])
-      changes += assign_tags(post, attributes[:tag_ids])
-
-      if changes > 0
-        find_post(post.id)
-      else
-        post
-      end
+      connection.put(Post, "posts/#{id.to_i}", attributes)
     end
 
     # Deletes the {Post} with the given ID.
@@ -147,7 +108,7 @@ module WordpressClient
     #
     # @return {PaginatedCollection[Category]}
     def categories(per_page: 10, page: 1)
-      connection.get_multiple(Category, "terms/category", page: page, per_page: per_page)
+      connection.get_multiple(Category, "categories", page: page, per_page: per_page)
     end
 
     # Find {Category} with the given ID.
@@ -156,7 +117,7 @@ module WordpressClient
     # @raise {NotFoundError}
     # @raise {subclasses of Error} on other unexpected errors
     def find_category(id)
-      connection.get(Category, "terms/category/#{id.to_i}")
+      connection.get(Category, "categories/#{id.to_i}")
     end
 
     # Create a new {Category} with the given attributes.
@@ -172,7 +133,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def create_category(attributes)
-      connection.create(Category, "terms/category", attributes)
+      connection.create(Category, "categories", attributes)
     end
 
     # Update the {Category} with the given id, setting the supplied attributes.
@@ -189,7 +150,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def update_category(id, attributes)
-      connection.patch(Category, "terms/category/#{id.to_i}", attributes)
+      connection.put(Category, "categories/#{id.to_i}", attributes)
     end
 
     # @!group Tags
@@ -198,7 +159,7 @@ module WordpressClient
     #
     # @return {PaginatedCollection[Tag]}
     def tags(per_page: 10, page: 1)
-      connection.get_multiple(Tag, "terms/tag", page: page, per_page: per_page)
+      connection.get_multiple(Tag, "tags", page: page, per_page: per_page)
     end
 
     # Find {Tag} with the given ID.
@@ -207,7 +168,7 @@ module WordpressClient
     # @raise {NotFoundError}
     # @raise {subclasses of Error} on other unexpected errors
     def find_tag(id)
-      connection.get(Tag, "terms/tag/#{id.to_i}")
+      connection.get(Tag, "tags/#{id.to_i}")
     end
 
     # Create a new {Tag} with the given attributes.
@@ -223,7 +184,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def create_tag(attributes)
-      connection.create(Tag, "terms/tag", attributes)
+      connection.create(Tag, "tags", attributes)
     end
 
     # Update the {Tag} with the given id, setting the supplied attributes.
@@ -240,7 +201,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def update_tag(id, attributes)
-      connection.patch(Tag, "terms/tag/#{id.to_i}", attributes)
+      connection.put(Tag, "tags/#{id.to_i}", attributes)
     end
 
     # @!group Media
@@ -322,7 +283,7 @@ module WordpressClient
     # @raise {ValidationError}
     # @raise {subclasses of Error} on other unexpected errors
     def update_media(id, attributes)
-      connection.patch(Media, "media/#{id.to_i}", attributes)
+      connection.put(Media, "media/#{id.to_i}", attributes)
     end
 
     # @!endgroup
@@ -333,20 +294,5 @@ module WordpressClient
 
     private
     attr_reader :connection
-
-    def assign_categories(post, ids)
-      return 0 unless ids
-      ReplaceTerms.apply_categories(connection, post, ids)
-    end
-
-    def assign_tags(post, ids)
-      return 0 unless ids
-      ReplaceTerms.apply_tags(connection, post, ids)
-    end
-
-    def assign_meta(post, meta)
-      return 0 unless meta
-      ReplaceMetadata.apply(connection, post, meta)
-    end
   end
 end

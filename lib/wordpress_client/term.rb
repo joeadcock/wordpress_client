@@ -14,7 +14,7 @@ module WordpressClient
     # @!attribute [r] name_html
     #   @return [String] The name of the resource, HTML encoded.
     #   @example
-    #     term.name_html #=> "Father &amp; Daughter stuff"
+    #     term.name_html #=> "Father &#038; Daughter stuff"
 
     # @!attribute [r] slug
     #   @return [String] The slug of the resource in Wordpress.

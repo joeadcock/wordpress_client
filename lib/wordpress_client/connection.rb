@@ -50,14 +50,14 @@ module WordpressClient
       true
     end
 
-    def patch(model, path, attributes)
+    def put(model, path, attributes)
       model.parse(
-        parse_json_response(send_json(path, attributes, method: :patch))
+        parse_json_response(send_json(path, attributes, method: :put))
       )
     end
 
-    def patch_without_response(path, attributes)
-      handle_status_code(send_json(path, attributes, method: :patch))
+    def put_without_response(path, attributes)
+      handle_status_code(send_json(path, attributes, method: :put))
       true
     end
 
@@ -66,9 +66,7 @@ module WordpressClient
       response = post_data(path, body, {
         "Content-Length" => body.size.to_s,
         "Content-Type" => mime_type,
-        # WP API does not parse normal Content-Disposition and instead ops to using their own format
-        # https://github.com/WP-API/WP-API/issues/1744
-        "Content-Disposition" => "filename=#{filename || "unnamed"}",
+        "Content-Disposition" => 'attachment; filename="' + (filename || "unnamed") + '"',
       })
 
       if response.status == 201 # Created
@@ -112,8 +110,9 @@ module WordpressClient
     def get_json_and_response(path, params = {})
       response = net.get(path, params)
       [parse_json_response(response), response]
-    rescue Faraday::TimeoutError
-      raise TimeoutError
+    rescue Faraday::ConnectionFailed => error
+      raise TimeoutError if error.cause.class == Net::OpenTimeout
+      raise
     end
 
     def send_json(path, data, method: :post)

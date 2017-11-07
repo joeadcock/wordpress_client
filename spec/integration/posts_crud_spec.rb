@@ -71,7 +71,7 @@ describe "Posts (CRUD)" do
     )
 
     expect(post.content_html.strip).to eq '<p class="hello-world">Hello world</p>'
-    expect(post.title_html.strip).to eq 'HTML test &amp; verify'
+    expect(post.title_html.strip).to eq 'HTML test &#038; verify'
   end
 
   it "can move a post to the trash can" do
