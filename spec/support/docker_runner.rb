@@ -38,16 +38,31 @@ module DockerRunner
     end
   end
 
-  def purge_container(id)
-    output = `docker kill #{id.shellescape}; docker rm #{id.shellescape} `
+  def kill_container(id)
+    output = `docker kill #{id.shellescape} 2>&1`
+    raise_on_failure(
+      action: "kill",
+      id: id,
+      exit_status: $?,
+      output: output,
+    )
+  end
 
-    unless $?.success?
-      message = "Could not clean up docker image #{id}. Output was:\n#{output}.\n"
-      if ENV["CIRCLECI"]
-        puts message
-      else
-        raise message
-      end
+  def remove_container(id)
+    output = `docker rm #{id.shellescape} 2>&1`
+    raise_on_failure(
+      action: "remove",
+      id: id,
+      exit_status: $?,
+      output: output,
+    )
+  end
+
+  private
+  def raise_on_failure(action:, exit_status:, output:, id:)
+    unless exit_status.success?
+      message = "Could not #{action} docker image #{id}. Output was:\n#{output}.\n"
+      raise message
     end
   end
 end
