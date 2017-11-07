@@ -10,4 +10,4 @@ gunzip -c /tmp/dbdump.sql.gz | \
     --batch \
     "$MYSQL_DB"
 
-rm /tmp/dbdump.sql.gz
+rm -rf /tmp/dbdump.sql.gz

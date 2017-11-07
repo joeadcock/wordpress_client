@@ -32,27 +32,39 @@ This image is based on Appcontainer's Wordpress image, which runs Apache, MySQL 
 
 ### Re-creating DB dump from scratch
 
-If you need to regenerate the DB dump, remove the part where the file is copied and restored from the `Dockerfile`, then build and start the image.
+If you need to regenerate the DB dump, remove the part where the file is copied
+and restored from the `Dockerfile`, then build and start the image.
 
 ```bash
-docker build -t wordpress_client_test:dev .
-docker run -it -p 8181:80 wordpress_client_test:dev
+docker build -t hemnet/wordpress_client_test:dev .
+docker run -it -p 8181:80 hemnet/wordpress_client_test:dev
 ```
 
-You'll get a `bash` shell inside the container. Open your browser and go to the newly booted application (`localhost:8181` if you have native Docker; otherwise go to your `DOCKER_HOST_IP:8181` URL – see `echo $DOCKER_HOST` in your local shell).
+You'll get a `bash` shell inside the container. Open your browser and go to the
+newly booted application ([`localhost:8181`](http://localhost:8181/)).
 
-You'll be greeted by the Wordpress installer. Fill in everything and complete the installation.
+You'll be greeted by the Wordpress installer. Fill in everything and complete
+the installation.
+
+* Blog title `wordpress_client test`
+* Username `test`
+* Password `test`
+* [Set up permalinks according to **Day and
+  name**!](http://localhost:8181/wp-admin/options-permalink.php)
+   * Without this the provided `.htaccess` will cause API requests to redirect.
+* [Activate the Basic Auth plugin](http://localhost:8181/wp-admin/plugins.php)
 
 Then, **in your container's terminal**, run the following command:
 
 ```bash
-mysqldump -u "$MYSQL_USER" --password="$MYSQL_PASS" --host="$MYSQL_HOST" "$MYSQL_DB" | gzip -9 > /tmp/dbdump.sql.gz
+mysqldump -u "$MYSQL_USER" --password="$MYSQL_PASS" --host="$MYSQL_HOST" "$MYSQL_DB" | \
+  gzip -9 > /tmp/dbdump.sql.gz
 ```
 
 You can then copy the file to your host using the `docker cp` command:
 
 ```bash
-docker ps | grep wordpress_client_test:dev
+docker ps | grep hemnet/wordpress_client_test:dev
 # See the container ID or name of your running container
 docker cp THE-CONTAINER-ID:/tmp/dbdump.sql.gz .
 ```
