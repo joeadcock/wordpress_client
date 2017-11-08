@@ -1,3 +1,7 @@
+# 2.0.0
+
+* Switch from WP REST API plugin to native WP API in Wordpress 4.6+.
+
 # 1.0.1
 
 * Bugfixes for latest Wordpress
