@@ -87,7 +87,7 @@ module WordpressClient
     end
 
     def setup_network_connection
-      Faraday.new(url: "#{url}/wp/v2") do |conn|
+      Faraday.new(url: File.join(url, "wp/v2")) do |conn|
         conn.request :basic_auth, username, @password
         conn.adapter :net_http
       end

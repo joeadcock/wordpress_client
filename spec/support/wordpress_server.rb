@@ -1,5 +1,7 @@
 require_relative "docker_runner"
 
+# rubocop:disable Rails/TimeZone
+
 class WordpressServer
   include Singleton
 
@@ -47,9 +49,10 @@ class WordpressServer
 
     begin
       wait_for_container_to_start
-    rescue
+    rescue => error
+      puts "Could not start container: #{error}. Cleaning up."
       purge_container
-      raise $!
+      raise error
     end
   end
 
@@ -57,7 +60,7 @@ class WordpressServer
     unless DockerRunner.docker_installed?
       STDERR.puts(
         "It does not look like you have docker installed. " \
-        "Please install docker so you can run integration tests."
+          "Please install docker so you can run integration tests.",
       )
       fail "No docker installed"
     end
@@ -73,21 +76,26 @@ class WordpressServer
     DockerRunner.run_container(
       DOCKER_IMAGE_NAME,
       port: port,
-      environment: {wordpress_host: host_with_port}
+      environment: {wordpress_host: host_with_port},
     )
   end
 
   def purge_container
     if @running
-      DockerRunner.purge_container(container_id)
-      @running = true
+      DockerRunner.kill_container(container_id)
+      @running = false
+
+      # CircleCI does not allow `docker rm`.
+      unless ENV["CIRCLECI"]
+        DockerRunner.remove_container(container_id)
+      end
     end
   end
 
   def wait_for_container_to_start
     # Try to connect to the webserver in a loop until we successfully connect,
     # the container process dies, or the timeout is reached.
-    timeout = 60
+    timeout = 10
     start = Time.now
 
     loop do
