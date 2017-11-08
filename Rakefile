@@ -20,13 +20,15 @@ namespace :docker do
     raise "Invalid version string" unless version =~ /\A[\d.]+\z/
 
     latest = prompt "Do you want this to be the :latest release? [Y/n]"
-    latest = (latest.empty? || latest.downcase == "y")
+    latest = (latest.empty? || latest.casecmp("y").zero?)
 
     sh "docker", "tag", DEV_IMAGE, "#{IMAGE_NAME}:#{version}"
-    sh "docker", "tag", "-f", DEV_IMAGE, "#{IMAGE_NAME}:latest" if latest
-
     sh "docker", "push", "#{IMAGE_NAME}:#{version}"
-    sh "docker", "push", "#{IMAGE_NAME}:latest" if latest
+
+    if latest
+      sh "docker", "tag", DEV_IMAGE, "#{IMAGE_NAME}:latest"
+      sh "docker", "push", "#{IMAGE_NAME}:latest"
+    end
   end
 end
 
