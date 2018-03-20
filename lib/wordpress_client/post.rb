@@ -57,10 +57,6 @@ module WordpressClient
     #   @see Category
     #   @see Client#update_post
 
-    # @!attribute [rw] meta_ids
-    #   @api private
-    #   Backs the {#meta_id_for} method. Used when constructing requests.
-
     # @api private
     def self.parse(data)
       PostParser.parse(data)
