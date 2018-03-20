@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.4
+      - image: hemnet/wordpress_client_test:latest
+        name: wordpress
+        environment:
+          WORDPRESS_HOST: wordpress
+    environment:
+      - CI: "true"
+    steps:
+      - checkout
+      - run:
+          name: Bundler version
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - wordpress_client-bundle-{{ checksum "Gemfile" }}-{{ checksum "wordpress_client.gemspec" }}
+            - wordpress_client-bundle-
+      - run:
+          name: Bundle install
+          command: bundle check || bundle install --without "guard"
+      - save_cache:
+          key: wordpress_client-bundle-{{ checksum "Gemfile" }}-{{ checksum "wordpress_client.gemspec" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: RSpec
+          command: bundle exec rspec
