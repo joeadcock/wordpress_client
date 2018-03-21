@@ -29,12 +29,13 @@ module DockerRunner
       docker run \
         -dit -p #{port.to_i}:80 \
         #{environment_flags.join(" ")} \
-        #{name.shellescape}
+        #{name.shellescape} \
+      2>&1
     `
     if $?.success?
       output.chomp
     else
-      fail "Failed to start container. Maybe it's already running? Output: #{output}"
+      fail "Failed to start container. Maybe it's already running? Output:\n#{output}"
     end
   end
 
