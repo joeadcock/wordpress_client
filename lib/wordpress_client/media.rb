@@ -2,7 +2,7 @@ module WordpressClient
   # Represents a media record in Wordpress.
   class Media
     attr_accessor(
-      :id, :slug, :media_type, :title_html, :description,
+      :id, :slug, :media_type, :title_html, :description, :alt_text,
       :date, :updated_at,
       :guid, :link, :media_details
     )
@@ -52,6 +52,7 @@ module WordpressClient
       slug: nil,
       media_type: nil,
       title_html: nil,
+      alt_text: nil,
       description: nil,
       date: nil,
       updated_at: nil,
@@ -65,6 +66,7 @@ module WordpressClient
       @title_html = title_html
       @date = date
       @updated_at = updated_at
+      @alt_text = alt_text
       @description = description
       @guid = guid
       @link = link

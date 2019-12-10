@@ -11,6 +11,7 @@ module WordpressClient
       expect(media.media_type).to eq "image"
       expect(media.title_html).to eq "thoughtful"
       expect(media.slug).to eq "thoughtful"
+      expect(media.alt_text).to eq "accessibility is cool"
       expect(media.description).to eq ""
 
       expect(media.guid).to eq "http://example.com/wp-content/uploads/2015/11/thoughtful.jpg"
