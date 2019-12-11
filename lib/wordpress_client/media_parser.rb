@@ -30,6 +30,7 @@ module WordpressClient
       media.media_type = data.fetch("media_type")
       media.slug = data.fetch("slug")
       media.link = data.fetch("link")
+      media.alt_text = data.fetch("alt_text")
       media.description = data["description"]
       media.media_details = data["media_details"]
     end
