@@ -111,6 +111,7 @@ module WordpressServer
 
         begin
           response = Faraday.get(url)
+          fail response.body if response.status == 500
           return if response.status == 200
         rescue Faraday::ConnectionFailed
           # Server not yet started. Just wait it out...
