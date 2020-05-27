@@ -4,7 +4,7 @@ require_relative "docker_runner"
 
 module WordpressServer
   def self.instance
-    if ENV["CI"].strip.size > 0
+    if (ENV["CI"] || "").strip.size > 0
       CIStrategy.instance
     else
       DockerStrategy.instance
