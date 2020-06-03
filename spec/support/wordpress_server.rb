@@ -4,7 +4,7 @@ require_relative "docker_runner"
 
 module WordpressServer
   def self.instance
-    if ENV["CI"].strip.size > 0
+    if (ENV["CI"] || "").strip.size > 0
       CIStrategy.instance
     else
       DockerStrategy.instance
@@ -111,6 +111,7 @@ module WordpressServer
 
         begin
           response = Faraday.get(url)
+          fail response.body if response.status == 500
           return if response.status == 200
         rescue Faraday::ConnectionFailed
           # Server not yet started. Just wait it out...
