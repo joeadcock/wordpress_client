@@ -21,6 +21,9 @@ RUN yum clean all
 # base image only contains American timezones
 RUN yum install -y tzdata
 
+RUN yum remove -y php php-common php-cli php-mysql
+RUN yum install -y php56-php php56-php-common php56-php-cli php56-php-mysql
+
 ENV APP_NAME testapp.com
 ENV APACHE_SVRALIAS www.testapp.com localhost
 ENV MYSQL_SERVER localhost
