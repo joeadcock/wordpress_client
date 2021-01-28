@@ -14,8 +14,15 @@ RUN echo "register_meta('post', 'foo', array('type' => 'integer', 'description' 
 RUN echo "register_meta('post', 'bar', array('type' => 'boolean', 'description' => 'Some kind of boolean', 'single' => true, 'show_in_rest' => true));" >>/var/www/html/wordpress/wp-config.php
 RUN echo "register_meta('post', 'baz', array('type' => 'string', 'description' => 'Some kind of string', 'single' => true, 'show_in_rest' => true));" >>/var/www/html/wordpress/wp-config.php
 
+# Resolve broken mirrorfile
+COPY yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+RUN yum clean all
+
 # base image only contains American timezones
 RUN yum install -y tzdata
+
+RUN yum remove -y php php-common php-cli php-mysql
+RUN yum install -y php56-php php56-php-common php56-php-cli php56-php-mysql
 
 ENV APP_NAME testapp.com
 ENV APACHE_SVRALIAS www.testapp.com localhost
