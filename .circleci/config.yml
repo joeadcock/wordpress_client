@@ -12,8 +12,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Bundler version
-          command: bundle -v
+          name: Update Bundler
+          command: gem install bundler
       - restore_cache:
           keys:
             - wordpress_client-bundle-{{ checksum "Gemfile" }}-{{ checksum "wordpress_client.gemspec" }}
