@@ -35,6 +35,7 @@ module WordpressClient
       post.category_ids = data["categories"]
       post.tag_ids = data["tags"]
       post.featured_media_id = data["featured_media"]
+      post.yoast_head_json = data['yoast_head_json']
     end
 
     def assign_dates(post)

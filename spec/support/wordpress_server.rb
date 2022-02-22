@@ -103,7 +103,7 @@ module WordpressServer
     def wait_for_container_to_start
       # Try to connect to the webserver in a loop until we successfully connect,
       # the container process dies, or the timeout is reached.
-      timeout = 10
+      timeout = 60
       start = Time.now
 
       loop do

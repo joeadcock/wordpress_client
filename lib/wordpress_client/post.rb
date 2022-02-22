@@ -6,7 +6,7 @@ module WordpressClient
   # @see http://v2.wp-api.org/reference/posts/ API documentation for Post
   class Post
     attr_accessor(
-      :id, :slug, :url, :guid, :status,
+      :id, :slug, :url, :guid, :status, :yoast_head_json,
       :title_html, :excerpt_html, :content_html,
       :updated_at, :date,
       :categories, :tags, :meta, :featured_media,
@@ -72,6 +72,7 @@ module WordpressClient
       title_html: nil,
       excerpt_html: nil,
       content_html: nil,
+      yoast_head_json: nil,
       updated_at: nil,
       date: nil,
       categories: [],
@@ -86,6 +87,7 @@ module WordpressClient
       @url = url
       @guid = guid
       @status = status
+      @yoast_head_json = yoast_head_json
       @title_html = title_html
       @excerpt_html = excerpt_html
       @content_html = content_html
