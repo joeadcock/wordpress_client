@@ -1,3 +1,5 @@
+* Update to Faraday 2
+
 # 2.0.1
 
 * Loosen Faraday version constraint to < 2.
